@@ -7,18 +7,15 @@ export const AboutSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-5">
             <span className="text-[11px] font-bold uppercase tracking-widest text-red-500">
               Sobre Atlas
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-              Pioneros en Procura Automotriz Digital para Venezuela
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              En Atlas transformamos el modelo tradicional de importación. Eliminamos intermediarios innecesarios conectando al cliente directamente con los centros logísticos automotrices de Dubái y China.
+            <p className="text-base sm:text-lg text-white font-semibold leading-relaxed">
+              Atlas nace con un propósito claro: ofrecerte una experiencia de adquisición 100% digital, sin complicaciones y libre de los obstáculos tradicionales. Creemos que comprar un vehículo debe ser un proceso emocionante, directo y sin estrés. Por eso, hemos creado un ecosistema digital donde la tecnología y el diseño automotriz se encuentran.
             </p>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Nuestra plataforma brinda visibilidad completa de costos, trámites de nacionalización y seguimiento satelital de cada unidad desde el embarque hasta que el vehículo está rodando en las calles de Venezuela.
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Explora nuestra vitrina virtual, selecciona tu modelo, realiza tu pago a través de nuestras pasarelas seguras y nosotros nos encargamos de preparar tu unidad. Simplificamos cada paso para que pases menos tiempo en trámites y más tiempo disfrutando de tu vehículo.
             </p>
 
             {/* Checklist */}
