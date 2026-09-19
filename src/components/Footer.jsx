@@ -16,7 +16,7 @@ export const Footer = ({ onSelectLine }) => {
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Logística y procura automotriz internacional. Especialistas en importación bajo demanda de vehículos y motocicletas desde Dubái y China con entrega llave en mano en Venezuela.
+              Importación bajo demanda de vehículos y motocicletas a nivel internacional con entrega llave en mano en Venezuela.
             </p>
             <div className="flex items-center gap-1.5 text-slate-300 text-[11px] pt-1">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
@@ -71,40 +71,40 @@ export const Footer = ({ onSelectLine }) => {
             </ul>
           </div>
 
-          {/* Cobertura y Puertos */}
+          {/* Puertos */}
           <div>
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">Rutas & Puertos</h4>
+            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">Puertos</h4>
             <ul className="space-y-2 text-slate-400">
               <li className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
-                <span>Puerto de Jebel Ali, Dubái (EAU)</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
-                <span>Puerto de Ningbo / Shanghai, China</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span>Puerto Cabello, Carabobo (VEN)</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <span>Puerto de La Guaira, La Guaira (VEN)</span>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-amber-400/80 shrink-0" />
+                <span>Puerto de Puerto Cabello <span className="text-[11px] text-amber-400 font-medium">(Próximamente)</span></span>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-amber-400/80 shrink-0" />
+                <span>Puerto El Guamache (Isla de Margarita, Nueva Esparta) <span className="text-[11px] text-amber-400 font-medium">(Próximamente)</span></span>
               </li>
             </ul>
           </div>
 
-          {/* Contacto Directo */}
+          {/* Atención y Soporte */}
           <div>
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">Atención & Despacho</h4>
+            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">Atención y Soporte</h4>
             <ul className="space-y-2 text-slate-400">
               <li className="flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5 text-slate-400" />
-                <span>+1 555-555-5556</span>
+                <a href="tel:+584222932455" className="hover:text-white transition-colors font-medium">
+                  +58 422 293 2455
+                </a>
               </li>
               <li className="flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-slate-400" />
-                <span className="truncate">corporationatlas969@gmail.com</span>
+                <a href="mailto:corporationatlas969@gmail.com" className="truncate hover:text-white transition-colors">
+                  corporationatlas969@gmail.com
+                </a>
               </li>
               <li className="pt-2 text-[11px] text-slate-500">
                 Atención presencial en oficinas y concesionarios aliados en Caracas y Valencia.

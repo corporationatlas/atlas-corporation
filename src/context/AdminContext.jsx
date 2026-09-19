@@ -12,11 +12,11 @@ export const useAdmin = () => {
 };
 
 const initialCompanyInfo = {
-  phone: '+1 555-555-5556',
+  phone: '+58 422 293 2455',
   email: 'corporationatlas969@gmail.com',
-  whatsapp: '+584121234567',
+  whatsapp: '584222932455',
   address: 'Oficinas en Caracas y Valencia | Almacén en Puerto Cabello',
-  ownerName: 'Atlas Corporation Admin',
+  ownerName: 'Corporation Atlas Admin',
   announcement: '✨ Promoción Especial: Envío asegurado y gestión de placas en Venezuela incluido.'
 };
 
