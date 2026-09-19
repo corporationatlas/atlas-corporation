@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { vehicles as initialVehicles, procurementLines as initialLines } from '../data/products';
+import { db } from '../firebase';
+import { collection, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
 
 const AdminContext = createContext();
 
@@ -162,6 +164,29 @@ export const AdminProvider = ({ children }) => {
     localStorage.setItem('atlas_has_pending_changes', hasUnpublishedChanges ? 'true' : 'false');
   }, [hasUnpublishedChanges]);
 
+  // Sincronización en Tiempo Real de Órdenes con Cloud Firestore
+  useEffect(() => {
+    try {
+      const unsub = onSnapshot(collection(db, 'orders'), (snapshot) => {
+        if (!snapshot.empty) {
+          const remoteOrders = snapshot.docs.map((d) => ({ ...d.data(), id: d.id }));
+          setOrdersList((prev) => {
+            const combined = [...remoteOrders];
+            prev.forEach((p) => {
+              if (!combined.some((c) => c.id === p.id)) combined.push(p);
+            });
+            return combined;
+          });
+        }
+      }, (err) => {
+        console.warn('Firestore onSnapshot listener status:', err.message);
+      });
+      return () => unsub();
+    } catch (err) {
+      console.warn('Error inicializando listener de Firestore:', err);
+    }
+  }, []);
+
   // Acciones sobre Vehículos
   const addVehicle = (newVehicle) => {
     const item = {
@@ -211,15 +236,39 @@ export const AdminProvider = ({ children }) => {
     setHasUnpublishedChanges(true);
   };
 
-  // Acciones sobre Órdenes
-  const addOrder = (order) => {
-    setOrdersList((prev) => [order, ...prev]);
+  // Acciones sobre Órdenes (Sincronizadas con Cloud Firestore en tiempo real)
+  const addOrder = async (order) => {
+    const orderId = order.id || ('ATL-' + Date.now() + '-VE');
+    const enrichedOrder = {
+      ...order,
+      id: orderId,
+      createdAt: order.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setOrdersList((prev) => [enrichedOrder, ...prev]);
+
+    try {
+      await setDoc(doc(db, 'orders', orderId), enrichedOrder);
+      console.log('✅ Orden guardada en Cloud Firestore:', orderId);
+    } catch (e) {
+      console.warn('Respaldo local para orden:', e.message);
+    }
   };
 
-  const updateOrderStatus = (orderId, newStatus) => {
+  const updateOrderStatus = async (orderId, newStatus) => {
     setOrdersList((prev) =>
       prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
+
+    try {
+      await updateDoc(doc(db, 'orders', orderId), {
+        status: newStatus,
+        updatedAt: new Date().toISOString()
+      });
+      console.log('✅ Estatus actualizado en Cloud Firestore:', orderId, newStatus);
+    } catch (e) {
+      console.warn('Error actualizando estatus en Firestore:', e.message);
+    }
   };
 
   const deleteOrder = (orderId) => {
