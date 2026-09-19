@@ -10,13 +10,10 @@ export const ProcurementLines = ({ onSelectLine, selectedLine, onExploreAll }) =
       <div className="max-w-7xl mx-auto">
         
         {/* Section Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Explora Nuestras Líneas de Procura
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl font-normal">
-            Vehículos y motocicletas importados bajo demanda, directo desde Dubái y China hasta Venezuela. Selecciona una categoría para ver los modelos disponibles.
-          </p>
         </div>
 
         {/* 8 Cards Grid */}

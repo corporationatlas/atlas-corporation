@@ -6,7 +6,7 @@ export const ServicesSection = () => {
     {
       icon: Globe,
       title: 'Procura Internacional Directa',
-      desc: 'Acceso directo a inventarios de vehículos y motocicletas en Dubái, China e India bajo especificaciones para exportación.'
+      desc: 'Acceso directo a inventarios de vehículos y motocicletas a nivel internacional bajo demanda para importación'
     },
     {
       icon: Ship,
@@ -21,7 +21,7 @@ export const ServicesSection = () => {
     {
       icon: KeyRound,
       title: 'Entrega Listo para Rodar',
-      desc: 'Inspección técnica pre-entrega (PDI), fluidos, batería y entrega directa en Caracas, Valencia, Maracaibo y resto del país.'
+      desc: 'Inspección técnica pre-entrega (PDI), fluidos, batería y entrega directa en Caracas'
     }
   ];
 
