@@ -172,7 +172,7 @@ export const Sidebar = ({
                 ) : (
                   <>
                     <Package className="w-3.5 h-3.5 text-slate-900" />
-                    <span>Mis Pedidos & Procura</span>
+                    <span>Mis Pedidos</span>
                   </>
                 )}
               </button>

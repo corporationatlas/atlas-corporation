@@ -173,31 +173,29 @@ export const UserPortal = () => {
           </div>
         </div>
 
-        {/* Lado derecho: Avatar del usuario y botón de cerrar sesión */}
-        <div className="flex items-center gap-3">
-          <div
+        {/* Lado derecho: Botón "Mi Perfil" con avatar (despliega los datos básicos) */}
+        <div className="flex items-center">
+          <button
             onClick={() => setActiveTab('profile')}
-            className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer transition-all"
-            title="Ver mis datos básicos"
+            className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border transition-all ${
+              activeTab === 'profile'
+                ? 'bg-white text-black border-white shadow-lg ring-2 ring-white/20'
+                : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300 hover:text-white'
+            }`}
+            title="Ver y editar Mi Perfil"
           >
-            <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold text-xs shadow overflow-hidden border border-white/20 shrink-0">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow overflow-hidden border shrink-0 ${
+              activeTab === 'profile' ? 'bg-black text-white border-black/20' : 'bg-white text-black border-white/20'
+            }`}>
               {currentUser?.photoURL ? (
                 <img src={currentUser.photoURL} alt={currentUser.name} className="w-full h-full object-cover" />
               ) : (
                 <span>{currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}</span>
               )}
             </div>
-            <span className="hidden md:inline text-xs font-bold text-slate-300">
+            <span className="text-xs font-bold">
               Mi Perfil
             </span>
-          </div>
-
-          <button
-            onClick={logout}
-            className="p-2 sm:p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 transition-all"
-            title="Cerrar sesión"
-          >
-            <LogOut className="w-4 h-4" />
           </button>
         </div>
       </header>
@@ -233,19 +231,6 @@ export const UserPortal = () => {
             <Navigation className="w-4 h-4" />
             <span>Seguimiento de Vehículo</span>
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          </button>
-
-          {/* Pestaña 3: Mis Datos Básicos */}
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
-              activeTab === 'profile'
-                ? 'bg-white text-black shadow-lg'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <User className="w-4 h-4" />
-            <span>Mis Datos Básicos</span>
           </button>
         </div>
       </div>
@@ -289,7 +274,7 @@ export const UserPortal = () => {
                   className="px-6 py-3 rounded-xl bg-white text-black text-xs font-bold hover:bg-slate-200 transition-all shadow-md inline-flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Ir a la Vitrina de Vehículos</span>
+                  <span>Ir al menú principal</span>
                 </button>
               </div>
             ) : (
@@ -692,14 +677,23 @@ export const UserPortal = () => {
           </div>
         )}
 
-        {/* ================= TAB 3: MIS DATOS BÁSICOS & FOTO DE PERFIL ================= */}
+        {/* ================= VISTA: MI PERFIL (DATOS BÁSICOS & FOTO) ================= */}
         {activeTab === 'profile' && (
           <div className="max-w-2xl space-y-6">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Mis Datos Básicos</h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Actualiza tu fotografía de perfil y datos personales para los trámites de importación, aduana y entrega.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Mi Perfil & Datos Básicos</h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Actualiza tu fotografía de perfil y datos personales para los trámites de importación, aduana y entrega.
+                </p>
+              </div>
+              <button
+                onClick={() => setActiveTab('orders')}
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10 flex items-center gap-1.5 self-start sm:self-auto"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Volver a Mis Pedidos</span>
+              </button>
             </div>
 
             <div className="bg-[#12141e] rounded-3xl border border-white/10 p-6 sm:p-8 space-y-6 shadow-xl">
