@@ -16,7 +16,7 @@ import { Toast } from './components/Toast';
 import { AdminPortal } from './components/AdminPortal';
 import { UserPortal } from './components/UserPortal';
 import { AuthModal } from './components/AuthModal';
-import { Menu, ShoppingCart, ShieldAlert, Package, LogIn } from 'lucide-react';
+import { Menu, ShoppingCart, ShieldAlert, Package } from 'lucide-react';
 
 function AtlasPublicStore() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -96,16 +96,6 @@ function AtlasPublicStore() {
         </div>
 
         <div className="flex items-center gap-2">
-          {!currentUser && (
-            <button
-              onClick={() => setIsAuthModalOpen(true)}
-              className="p-2 rounded-full bg-white/10 text-white hover:bg-white/20"
-              title="Iniciar sesión"
-            >
-              <LogIn className="w-4 h-4" />
-            </button>
-          )}
-
           <button
             onClick={() => setIsCartOpen(true)}
             className="relative p-2 rounded-full bg-white/10 text-white hover:bg-white/20"
@@ -136,7 +126,7 @@ function AtlasPublicStore() {
             ) : (
               <>
                 <Package className="w-4 h-4 text-emerald-600" />
-                <span>Mis Pedidos & Procura</span>
+                <span>Mis Pedidos</span>
               </>
             )}
           </button>
