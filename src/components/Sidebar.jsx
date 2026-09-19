@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart, Search, Phone, Mail, User, ShieldAlert, LogIn, LogOut, Package, ArrowRight, X } from 'lucide-react';
+import { ShoppingCart, Search, User, ShieldAlert, LogOut, Package, ArrowRight, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAdmin } from '../context/AdminContext';
 import { useAuth } from '../context/AuthContext';
@@ -126,26 +126,8 @@ export const Sidebar = ({
           </nav>
         </div>
 
-        {/* Bottom Section: Phone, Email & User/Admin Profile */}
-        <div className="pt-5 border-t border-white/15 space-y-3.5">
-          {/* Phone */}
-          <a
-            href={`tel:${companyInfo.phone}`}
-            className="flex items-center gap-2.5 text-xs text-slate-300 hover:text-white transition-colors"
-          >
-            <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span>{companyInfo.phone}</span>
-          </a>
-
-          {/* Email */}
-          <a
-            href={`mailto:${companyInfo.email}`}
-            className="flex items-center gap-2.5 text-xs text-slate-300 hover:text-white transition-colors truncate"
-          >
-            <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="truncate">{companyInfo.email}</span>
-          </a>
-
+        {/* Bottom Section: User Profile or Clean Tracking Action Button */}
+        <div className="pt-2">
           {/* Session Profile or Login Button */}
           {currentUser ? (
             <div className="p-3 rounded-2xl bg-[#141722]/80 border border-white/20 shadow-md space-y-2.5 backdrop-blur-xs">
@@ -192,21 +174,13 @@ export const Sidebar = ({
               </button>
             </div>
           ) : (
-            /* Login / Tracking trigger if not authenticated */
+            /* Clean Action Button: Rastrear mi Vehículo */
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="w-full py-3 px-3.5 rounded-2xl bg-[#141722]/85 hover:bg-[#1c202d] text-white text-xs font-bold transition-all flex items-center justify-between border border-white/20 hover:border-white/35 group shadow-lg shadow-black/30 backdrop-blur-xs"
+              className="w-full py-3 px-4 rounded-2xl bg-[#141722]/85 hover:bg-[#1c202d] text-white text-xs font-bold transition-all flex items-center justify-between border border-white/20 hover:border-white/35 group shadow-lg shadow-black/30 backdrop-blur-xs active:scale-98"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center border border-white/10 group-hover:bg-white/20 transition-colors">
-                  <LogIn className="w-3.5 h-3.5 text-slate-300 group-hover:text-white" />
-                </div>
-                <div className="text-left">
-                  <span className="block text-slate-100 font-bold leading-tight">Rastrear mi Vehículo</span>
-                  <span className="text-[10px] text-slate-400 font-normal group-hover:text-slate-300">Acceso a Portal / Dueño</span>
-                </div>
-              </div>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
+              <span className="text-slate-100 font-bold tracking-wide">Rastrear mi Vehículo</span>
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
             </button>
           )}
 
