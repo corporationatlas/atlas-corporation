@@ -15,7 +15,7 @@ const initialCompanyInfo = {
   phone: '+58 422 293 2455',
   email: 'corporationatlas969@gmail.com',
   whatsapp: '584222932455',
-  address: 'Oficinas en Caracas y Valencia | Almacén en Puerto Cabello',
+  address: 'Atención digital y procura internacional para toda Venezuela',
   ownerName: 'Corporation Atlas Admin',
   announcement: '✨ Promoción Especial: Envío asegurado y gestión de placas en Venezuela incluido.'
 };

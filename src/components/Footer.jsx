@@ -106,9 +106,6 @@ export const Footer = ({ onSelectLine }) => {
                   corporationatlas969@gmail.com
                 </a>
               </li>
-              <li className="pt-2 text-[11px] text-slate-500">
-                Atención presencial en oficinas y concesionarios aliados en Caracas y Valencia.
-              </li>
             </ul>
           </div>
 
