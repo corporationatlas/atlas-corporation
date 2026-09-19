@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
       const saved = localStorage.getItem('atlas_auth_session_v1');
       if (saved) {
         const u = JSON.parse(saved);
-        return u.role === 'admin' ? 'admin-portal' : 'user-portal';
+        return u.role === 'admin' ? 'admin-portal' : 'store';
       }
       return 'store';
     } catch {
@@ -123,7 +123,7 @@ export const AuthProvider = ({ children }) => {
         cedula: 'V-18.942.311'
       };
       setCurrentUser(clientUser);
-      setCurrentView('user-portal');
+      setCurrentView('store');
       setIsAuthModalOpen(false);
       setAuthLoading(false);
       return { success: true, role: 'user' };
@@ -141,7 +141,7 @@ export const AuthProvider = ({ children }) => {
         if (docSnap.exists()) {
           const profile = docSnap.data();
           setCurrentUser(profile);
-          setCurrentView(profile.role === 'admin' ? 'admin-portal' : 'user-portal');
+          setCurrentView(profile.role === 'admin' ? 'admin-portal' : 'store');
           setIsAuthModalOpen(false);
           setAuthLoading(false);
           return { success: true, role: profile.role || 'user' };
@@ -159,7 +159,7 @@ export const AuthProvider = ({ children }) => {
         role: 'user'
       };
       setCurrentUser(fallbackUser);
-      setCurrentView('user-portal');
+      setCurrentView('store');
       setIsAuthModalOpen(false);
       setAuthLoading(false);
       return { success: true, role: 'user' };
@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }) => {
         );
         if (found) {
           setCurrentUser(found);
-          setCurrentView(found.role === 'admin' ? 'admin-portal' : 'user-portal');
+          setCurrentView(found.role === 'admin' ? 'admin-portal' : 'store');
           setIsAuthModalOpen(false);
           setAuthLoading(false);
           return { success: true, role: found.role };
@@ -237,7 +237,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       setCurrentUser(newUser);
-      setCurrentView('user-portal');
+      setCurrentView('store');
       setIsAuthModalOpen(false);
       setAuthLoading(false);
       return true;
@@ -281,10 +281,33 @@ export const AuthProvider = ({ children }) => {
       }
 
       setCurrentUser(localUser);
-      setCurrentView('user-portal');
+      setCurrentView('store');
       setIsAuthModalOpen(false);
       setAuthLoading(false);
       return true;
+    }
+  };
+
+  // Actualizar datos del perfil (incluyendo foto de perfil)
+  const updateUserProfile = async (updatedData) => {
+    if (!currentUser) return;
+    const updated = { ...currentUser, ...updatedData };
+    setCurrentUser(updated);
+
+    try {
+      localStorage.setItem('atlas_auth_session_v1', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
+
+    const uid = currentUser.uid || currentUser.id;
+    if (uid) {
+      try {
+        await setDoc(doc(db, 'users', uid), updated, { merge: true });
+        console.log('✅ Perfil y avatar actualizados en Cloud Firestore:', uid);
+      } catch (err) {
+        console.warn('Error sincronizando perfil en Firestore:', err);
+      }
     }
   };
 
@@ -317,9 +340,11 @@ export const AuthProvider = ({ children }) => {
         isAuthModalOpen,
         setIsAuthModalOpen,
         authError,
+        authLoading,
         login,
         register,
         logout,
+        updateUserProfile,
         loginQuickAdmin,
         loginQuickClient
       }}

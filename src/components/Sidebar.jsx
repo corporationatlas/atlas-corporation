@@ -133,11 +133,15 @@ export const Sidebar = ({
             <div className="p-3 rounded-2xl bg-[#141722]/80 border border-white/20 shadow-md space-y-2.5 backdrop-blur-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center font-bold text-xs shadow">
-                    {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+                  <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold text-xs shadow overflow-hidden shrink-0 border border-white/20">
+                    {currentUser.photoURL ? (
+                      <img src={currentUser.photoURL} alt={currentUser.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}</span>
+                    )}
                   </div>
-                  <div>
-                    <span className="text-xs font-bold text-white block leading-tight truncate max-w-[120px]">
+                  <div className="overflow-hidden">
+                    <span className="text-xs font-bold text-white block leading-tight truncate max-w-[115px]">
                       {currentUser.name}
                     </span>
                     <span className="text-[10px] text-slate-400 block capitalize">
