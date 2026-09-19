@@ -104,7 +104,7 @@ export const Footer = ({ onSelectLine }) => {
               </li>
               <li className="flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-slate-400" />
-                <span className="truncate">info@sucompañía.example.com</span>
+                <span className="truncate">corporationatlas969@gmail.com</span>
               </li>
               <li className="pt-2 text-[11px] text-slate-500">
                 Atención presencial en oficinas y concesionarios aliados en Caracas y Valencia.
@@ -116,7 +116,7 @@ export const Footer = ({ onSelectLine }) => {
 
         {/* Bottom */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
-          <p>© 2026 Atlas Automotive Logistics. Todos los derechos reservados.</p>
+          <p>© 2026 Corporation Atlas. Todos los derechos reservados.</p>
           <p>Plataforma Digital de Procura Automotriz e Importación para Venezuela.</p>
         </div>
       </div>
