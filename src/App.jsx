@@ -199,13 +199,21 @@ function AtlasPublicStore() {
 }
 
 function MainView() {
-  const { currentView } = useAuth();
+  const { currentView, currentUser } = useAuth();
 
+  // Guarda estricta: Solo administradores autenticados pueden ver el panel de administración
   if (currentView === 'admin-portal') {
+    if (!currentUser || currentUser.role !== 'admin') {
+      return <AtlasPublicStore />;
+    }
     return <AdminPortal />;
   }
 
+  // Guarda estricta: Solo clientes registrados y autenticados pueden ver el panel de pedidos
   if (currentView === 'user-portal') {
+    if (!currentUser) {
+      return <AtlasPublicStore />;
+    }
     return <UserPortal />;
   }
 

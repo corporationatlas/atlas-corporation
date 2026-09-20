@@ -51,7 +51,41 @@ export const AdminPortal = () => {
     publishSuccessMsg
   } = useAdmin();
 
-  const { currentUser, setCurrentView, logout } = useAuth();
+  const { currentUser, setCurrentView, logout, setIsAuthModalOpen } = useAuth();
+
+  // GUARDA DE SEGURIDAD ESTRICTA: Acceso exclusivo a usuarios con rol 'admin'
+  if (!currentUser || currentUser.role !== 'admin') {
+    return (
+      <div className="min-h-screen bg-[#090a0d] text-white flex items-center justify-center p-4">
+        <div className="bg-[#12141c] border border-white/10 p-8 rounded-3xl max-w-md w-full text-center space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-16 h-16 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center mx-auto border border-red-500/20">
+            <ShieldAlert className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-black text-white">Acceso Denegado</h2>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Este panel es de uso exclusivo para el Administrador y Propietario de Corporation Atlas. Debes autenticarte con una clave autorizada.
+          </p>
+          <div className="pt-3 flex flex-col gap-2.5">
+            <button
+              onClick={() => {
+                setCurrentView('store');
+                setIsAuthModalOpen(true);
+              }}
+              className="w-full py-3 rounded-xl bg-white text-black text-xs font-bold hover:bg-slate-200 transition-all shadow-md active:scale-98"
+            >
+              Iniciar Sesión como Administrador
+            </button>
+            <button
+              onClick={() => setCurrentView('store')}
+              className="w-full py-2.5 rounded-xl bg-white/5 text-slate-400 text-xs font-semibold hover:bg-white/10 transition-all"
+            >
+              Volver a la Tienda
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const [activeTab, setActiveTab] = useState('vehicles'); // 'vehicles' | 'lines' | 'orders' | 'settings'
   const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState(null);

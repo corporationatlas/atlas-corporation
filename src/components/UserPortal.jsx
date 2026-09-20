@@ -22,14 +22,15 @@ import {
   ExternalLink,
   ChevronRight,
   AlertCircle,
-  FileText
+  FileText,
+  Lock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAdmin } from '../context/AdminContext';
 import { ProformaInvoiceModal } from './ProformaInvoiceModal';
 
 export const UserPortal = () => {
-  const { currentUser, setCurrentView, logout, updateUserProfile } = useAuth();
+  const { currentUser, setCurrentView, logout, updateUserProfile, setIsAuthModalOpen } = useAuth();
   const { ordersList } = useAdmin();
 
   // Tabs: 'orders' | 'tracking' | 'profile'
@@ -49,12 +50,45 @@ export const UserPortal = () => {
   });
   const [profileSaved, setProfileSaved] = useState(false);
 
-  // Filtrar pedidos del usuario
+  // GUARDA DE SEGURIDAD ESTRICTA: Bloqueo absoluto si no hay sesión iniciada
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-[#090a0d] text-white flex items-center justify-center p-4">
+        <div className="bg-[#12141c] border border-white/10 p-8 rounded-3xl max-w-md w-full text-center space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto border border-amber-500/20">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-black text-white">Acceso Restringido</h2>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Debes estar registrado e iniciar sesión obligatoriamente para acceder a tu historial de pedidos y seguimiento satelital de vehículos.
+          </p>
+          <div className="pt-3 flex flex-col gap-2.5">
+            <button
+              onClick={() => {
+                setCurrentView('store');
+                setIsAuthModalOpen(true);
+              }}
+              className="w-full py-3 rounded-xl bg-white text-black text-xs font-bold hover:bg-slate-200 transition-all shadow-md active:scale-98"
+            >
+              Iniciar Sesión / Registrarse
+            </button>
+            <button
+              onClick={() => setCurrentView('store')}
+              className="w-full py-2.5 rounded-xl bg-white/5 text-slate-400 text-xs font-semibold hover:bg-white/10 transition-all"
+            >
+              Volver a la Tienda
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Filtrar pedidos del usuario de forma estricta (solo pedidos que coincidan con su email o cédula)
   const myOrders = ordersList.filter(
     (o) =>
-      o.email?.toLowerCase() === currentUser?.email?.toLowerCase() ||
-      o.nombre?.toLowerCase() === currentUser?.name?.toLowerCase() ||
-      currentUser?.email === 'cliente@atlas.com' // Demo fallback
+      (o.email && o.email.toLowerCase() === currentUser.email?.toLowerCase()) ||
+      (currentUser.cedula && o.cedula && o.cedula.toLowerCase() === currentUser.cedula.toLowerCase())
   );
 
   // Pedido seleccionado para el mapa de seguimiento

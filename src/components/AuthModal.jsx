@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, User, Phone, MapPin, ArrowRight, AlertCircle } from 'lucide-react';
+import { X, Lock, Mail, User, Phone, MapPin, ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const AuthModal = () => {
@@ -8,7 +8,8 @@ export const AuthModal = () => {
     setIsAuthModalOpen,
     login,
     register,
-    authError
+    authError,
+    authLoading
   } = useAuth();
 
   const [mode, setMode] = useState('login'); // 'login' | 'register'
@@ -34,6 +35,11 @@ export const AuthModal = () => {
     register(registerData);
   };
 
+  const isAdminEmail = 
+    loginData.email.trim().toLowerCase() === 'corporationatlas969@gmail.com' ||
+    loginData.email.trim().toLowerCase() === 'admin@atlas.com' ||
+    loginData.email.trim().toLowerCase() === 'admin@corporationatlas.com';
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
@@ -54,10 +60,9 @@ export const AuthModal = () => {
             <X className="w-5 h-5" />
           </button>
 
-          {/* Modal Header: Large, Crisp & Immersive Logo without boxes or text clutter */}
+          {/* Modal Header */}
           <div className="flex flex-col items-center justify-center pt-2 pb-2 mb-6">
             <div className="relative w-44 h-32 flex items-center justify-center">
-              {/* Soft ambient backlight matching the metallic reflections */}
               <div className="absolute w-28 h-28 bg-slate-400/10 rounded-full blur-2xl pointer-events-none" />
               <img
                 src="/atlas-logo.png"
@@ -92,7 +97,7 @@ export const AuthModal = () => {
           </div>
 
           {authError && (
-            <div className="mb-4 flex items-center gap-2 text-xs text-red-400 bg-red-500/10 border border-red-500/20 p-2.5 rounded-xl">
+            <div className="mb-4 flex items-center gap-2 text-xs text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-xl animate-in fade-in duration-150">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{authError}</span>
             </div>
@@ -103,10 +108,18 @@ export const AuthModal = () => {
             <div className="space-y-4">
               <form onSubmit={handleLoginSubmit} className="space-y-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Correo Electrónico</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Correo Electrónico</span>
+                    </label>
+                    {isAdminEmail && (
+                      <span className="text-[10px] text-amber-400 font-bold bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3 text-amber-400" />
+                        <span>Portal Admin</span>
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="email"
                     required
@@ -120,7 +133,7 @@ export const AuthModal = () => {
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Contraseña</span>
+                    <span>{isAdminEmail ? 'Contraseña de Administrador' : 'Contraseña'}</span>
                   </label>
                   <input
                     type="password"
@@ -134,10 +147,21 @@ export const AuthModal = () => {
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-white hover:bg-slate-200 active:scale-98 text-slate-900 font-bold text-xs transition-all shadow-md mt-2 flex items-center justify-center gap-1.5"
+                  disabled={authLoading}
+                  className={`w-full py-3 rounded-xl font-bold text-xs transition-all shadow-md mt-2 flex items-center justify-center gap-1.5 ${
+                    authLoading
+                      ? 'bg-slate-700 text-slate-300 cursor-wait'
+                      : 'bg-white hover:bg-slate-200 active:scale-98 text-slate-900'
+                  }`}
                 >
-                  <span>Ingresar a ATLAS</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  {authLoading ? (
+                    <span>Verificando credenciales...</span>
+                  ) : (
+                    <>
+                      <span>{isAdminEmail ? 'Acceder al Panel de Control (Admin)' : 'Ingresar a ATLAS'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
                 </button>
               </form>
             </div>

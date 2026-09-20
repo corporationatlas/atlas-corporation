@@ -178,14 +178,25 @@ export const Sidebar = ({
               </button>
             </div>
           ) : (
-            /* Clean Action Button: Rastrear mi Vehículo */
-            <button
-              onClick={() => setIsAuthModalOpen(true)}
-              className="w-full py-3 px-4 rounded-2xl bg-[#141722]/85 hover:bg-[#1c202d] text-white text-xs font-bold transition-all flex items-center justify-between border border-white/20 hover:border-white/35 group shadow-lg shadow-black/30 backdrop-blur-xs active:scale-98"
-            >
-              <span className="text-slate-100 font-bold tracking-wide">Rastrear mi Vehículo</span>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
-            </button>
+            <div className="space-y-2">
+              {/* Clean Action Button: Rastrear mi Vehículo */}
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="w-full py-3 px-4 rounded-2xl bg-[#141722]/85 hover:bg-[#1c202d] text-white text-xs font-bold transition-all flex items-center justify-between border border-white/20 hover:border-white/35 group shadow-lg shadow-black/30 backdrop-blur-xs active:scale-98"
+              >
+                <span className="text-slate-100 font-bold tracking-wide">Rastrear mi Vehículo</span>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
+              </button>
+
+              {/* Botón de acceso de Administrador */}
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-[11px] font-semibold transition-all flex items-center justify-center gap-1.5 border border-white/5"
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-slate-400" />
+                <span>Acceso Administrador</span>
+              </button>
+            </div>
           )}
 
         </div>

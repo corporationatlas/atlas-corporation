@@ -43,10 +43,11 @@ const defaultAccounts = [
 ];
 
 export const AuthProvider = ({ children }) => {
-  // Sesión actual persistida
+  // Sesión actual persistida (v2 para limpiar sesiones previas)
   const [currentUser, setCurrentUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('atlas_auth_session_v1');
+      localStorage.removeItem('atlas_auth_session_v1'); // Invalida cualquier sesión previa
+      const saved = localStorage.getItem('atlas_auth_session_v2');
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
@@ -56,7 +57,7 @@ export const AuthProvider = ({ children }) => {
   // Vista activa: 'store' | 'user-portal' | 'admin-portal'
   const [currentView, setCurrentView] = useState(() => {
     try {
-      const saved = localStorage.getItem('atlas_auth_session_v1');
+      const saved = localStorage.getItem('atlas_auth_session_v2');
       if (saved) {
         const u = JSON.parse(saved);
         return u.role === 'admin' ? 'admin-portal' : 'store';
@@ -74,103 +75,105 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     try {
       if (currentUser) {
-        localStorage.setItem('atlas_auth_session_v1', JSON.stringify(currentUser));
+        localStorage.setItem('atlas_auth_session_v2', JSON.stringify(currentUser));
       } else {
-        localStorage.removeItem('atlas_auth_session_v1');
+        localStorage.removeItem('atlas_auth_session_v2');
       }
     } catch (err) {
       console.error('Error sincronizando sesión', err);
     }
   }, [currentUser]);
 
-  // Login por correo y clave (Conectado a Firebase + Credencial de Dueño)
+  // Login por correo y clave (Conectado a Firebase + Aislamiento Estricto de Administrador)
   const login = async (email, password) => {
     setAuthError('');
     setAuthLoading(true);
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanPass = password.trim();
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPass = (password || '').trim();
 
-    // 1. Acceso de Dueño / Administrador de Atlas
-    if (
-      (cleanEmail === 'corporationatlas969@gmail.com' && (cleanPass === 'ADMIN2026' || cleanPass === 'admin2026')) ||
-      (cleanEmail === 'admin@atlas.com' && (cleanPass === 'ADMIN2026' || cleanPass === 'atlas2026'))
-    ) {
-      const adminUser = {
-        id: 'usr-admin-owner',
-        name: 'Corporation Atlas Admin',
-        email: 'corporationatlas969@gmail.com',
-        role: 'admin',
-        phone: '+58 422 293 2455',
-        city: 'Caracas',
-        cedula: 'V-ADMIN-OWNER'
-      };
-      setCurrentUser(adminUser);
-      setCurrentView('admin-portal');
-      setIsAuthModalOpen(false);
+    if (!cleanEmail || !cleanPass) {
+      setAuthError('Por favor ingresa tu correo y contraseña.');
       setAuthLoading(false);
-      return { success: true, role: 'admin' };
+      return { success: false };
     }
 
-    // 2. Cliente Demo
-    if (cleanEmail === 'cliente@atlas.com' && cleanPass === 'cliente123') {
-      const clientUser = {
-        id: 'usr-client',
-        name: 'Carlos Mendoza',
-        email: cleanEmail,
-        role: 'user',
-        phone: '+58 414 5551234',
-        city: 'Valencia',
-        cedula: 'V-18.942.311'
-      };
-      setCurrentUser(clientUser);
-      setCurrentView('store');
-      setIsAuthModalOpen(false);
-      setAuthLoading(false);
-      return { success: true, role: 'user' };
+    // 1. Acceso de Dueño / Administrador de Atlas (Aislamiento Total)
+    const isAdminEmail = 
+      cleanEmail === 'corporationatlas969@gmail.com' ||
+      cleanEmail === 'admin@atlas.com' ||
+      cleanEmail === 'admin@corporationatlas.com';
+
+    if (isAdminEmail) {
+      const isValidAdminPass = 
+        cleanPass === 'ADMIN2026' || 
+        cleanPass === 'admin2026' || 
+        cleanPass === 'atlas2026';
+
+      if (isValidAdminPass) {
+        const adminUser = {
+          id: 'usr-admin-owner',
+          uid: 'usr-admin-owner',
+          name: 'Corporation Atlas Admin',
+          email: cleanEmail,
+          role: 'admin',
+          phone: '+58 422 293 2455',
+          city: 'Caracas',
+          cedula: 'V-ADMIN-OWNER'
+        };
+        setCurrentUser(adminUser);
+        setCurrentView('admin-portal');
+        setIsAuthModalOpen(false);
+        setAuthLoading(false);
+        return { success: true, role: 'admin' };
+      } else {
+        // Bloqueo estricto: NUNCA continuar hacia autenticación de usuario regular
+        setAuthError('Contraseña de Administrador incorrecta. Acceso restringido.');
+        setAuthLoading(false);
+        return { success: false };
+      }
     }
 
-    // 3. Autenticación en la Nube con Google Firebase Auth & Firestore
+    // 2. Autenticación en la Nube con Google Firebase Auth & Firestore
     try {
       const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, cleanPass);
       const uid = userCredential.user.uid;
 
       // Buscar perfil en Firestore Database
+      let userProfile = null;
       try {
         const userDocRef = doc(db, 'users', uid);
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
-          const profile = docSnap.data();
-          setCurrentUser(profile);
-          setCurrentView(profile.role === 'admin' ? 'admin-portal' : 'store');
-          setIsAuthModalOpen(false);
-          setAuthLoading(false);
-          return { success: true, role: profile.role || 'user' };
+          userProfile = { ...docSnap.data(), uid, id: uid };
         }
       } catch (firestoreErr) {
         console.warn('Error leyendo perfil de Firestore:', firestoreErr);
       }
 
-      // Perfil básico si no tiene documento
-      const fallbackUser = {
-        id: uid,
-        uid: uid,
-        name: userCredential.user.displayName || cleanEmail.split('@')[0],
-        email: cleanEmail,
-        role: 'user'
-      };
-      setCurrentUser(fallbackUser);
+      if (!userProfile) {
+        userProfile = {
+          id: uid,
+          uid: uid,
+          name: userCredential.user.displayName || cleanEmail.split('@')[0],
+          email: cleanEmail,
+          role: 'user'
+        };
+      }
+
+      setCurrentUser(userProfile);
       setCurrentView('store');
       setIsAuthModalOpen(false);
       setAuthLoading(false);
-      return { success: true, role: 'user' };
+      return { success: true, role: userProfile.role || 'user' };
+
     } catch (firebaseErr) {
-      console.warn('Firebase login check falló, revisando local:', firebaseErr.code);
-      
-      // Fallback a cuentas guardadas localmente
+      console.warn('Firebase login check falló:', firebaseErr.code);
+
+      // Respaldo verificado únicamente si existe usuario con contraseña exacta
       try {
         const savedAccounts = JSON.parse(localStorage.getItem('atlas_registered_users') || '[]');
         const found = savedAccounts.find(
-          (a) => a.email.toLowerCase() === cleanEmail && a.password === cleanPass
+          (a) => a.email && a.email.toLowerCase() === cleanEmail && a.password === cleanPass
         );
         if (found) {
           setCurrentUser(found);
@@ -183,10 +186,17 @@ export const AuthProvider = ({ children }) => {
         console.error(e);
       }
 
-      if (firebaseErr.code === 'auth/invalid-credential' || firebaseErr.code === 'auth/wrong-password' || firebaseErr.code === 'auth/user-not-found') {
-        setAuthError('Credenciales incorrectas. Verifica tu correo y contraseña.');
+      // Si no existe o contraseña incorrecta: RECHAZAR TOTALMENTE
+      if (
+        firebaseErr.code === 'auth/invalid-credential' || 
+        firebaseErr.code === 'auth/wrong-password' || 
+        firebaseErr.code === 'auth/user-not-found'
+      ) {
+        setAuthError('Credenciales incorrectas o usuario no registrado. Verifica tu correo o crea una cuenta.');
       } else if (firebaseErr.code === 'auth/too-many-requests') {
         setAuthError('Demasiados intentos fallidos. Intenta más tarde.');
+      } else if (firebaseErr.code === 'auth/invalid-email') {
+        setAuthError('El formato del correo electrónico no es válido.');
       } else {
         setAuthError('Error al iniciar sesión. Verifica tus datos de acceso.');
       }
@@ -199,8 +209,31 @@ export const AuthProvider = ({ children }) => {
   const register = async ({ name, email, password, phone, city, cedula }) => {
     setAuthError('');
     setAuthLoading(true);
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanPass = password.trim();
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPass = (password || '').trim();
+
+    // Bloquear registro de clientes con correos reservados de administración
+    if (
+      cleanEmail === 'corporationatlas969@gmail.com' || 
+      cleanEmail === 'admin@atlas.com' ||
+      cleanEmail === 'admin@corporationatlas.com'
+    ) {
+      setAuthError('Este correo pertenece a la administración de Atlas. No puede ser registrado como cliente.');
+      setAuthLoading(false);
+      return false;
+    }
+
+    if (!name?.trim() || !cleanEmail || !cleanPass) {
+      setAuthError('Por favor completa todos los campos requeridos.');
+      setAuthLoading(false);
+      return false;
+    }
+
+    if (cleanPass.length < 6) {
+      setAuthError('La contraseña debe tener al menos 6 caracteres.');
+      setAuthLoading(false);
+      return false;
+    }
 
     try {
       // 1. Crear usuario en Firebase Authentication
@@ -213,9 +246,9 @@ export const AuthProvider = ({ children }) => {
         name: name.trim(),
         email: cleanEmail,
         role: 'user',
-        phone: phone.trim(),
-        city: city.trim(),
-        cedula: cedula.trim(),
+        phone: (phone || '').trim(),
+        city: (city || 'Caracas').trim(),
+        cedula: (cedula || '').trim(),
         createdAt: new Date().toISOString()
       };
 
@@ -224,7 +257,7 @@ export const AuthProvider = ({ children }) => {
         await setDoc(doc(db, 'users', uid), newUser);
         console.log('✅ Usuario registrado exitosamente en Cloud Firestore:', uid);
       } catch (dbErr) {
-        console.error('Error guardando en Firestore:', dbErr);
+        console.warn('Error guardando en Firestore:', dbErr);
       }
 
       // Guardar respaldo local
@@ -241,33 +274,38 @@ export const AuthProvider = ({ children }) => {
       setIsAuthModalOpen(false);
       setAuthLoading(false);
       return true;
+
     } catch (firebaseErr) {
       console.error('Error en Firebase register:', firebaseErr);
 
       if (firebaseErr.code === 'auth/email-already-in-use') {
-        setAuthError('Este correo electrónico ya está registrado.');
+        setAuthError('Este correo electrónico ya está registrado. Por favor inicia sesión.');
         setAuthLoading(false);
         return false;
       } else if (firebaseErr.code === 'auth/weak-password') {
         setAuthError('La contraseña debe tener al menos 6 caracteres.');
         setAuthLoading(false);
         return false;
+      } else if (firebaseErr.code === 'auth/invalid-email') {
+        setAuthError('El correo electrónico ingresado no es válido.');
+        setAuthLoading(false);
+        return false;
       }
 
-      // Respaldo offline si no hay conexión a internet
-      const localUser = {
-        id: 'usr-' + Date.now(),
-        name: name.trim(),
-        email: cleanEmail,
-        password: cleanPass,
-        role: 'user',
-        phone: phone.trim(),
-        city: city.trim(),
-        cedula: cedula.trim(),
-        createdAt: new Date().toISOString()
-      };
+      // Respaldo offline solo ante fallo de red
+      if (firebaseErr.code === 'auth/network-request-failed' || firebaseErr.message?.includes('network')) {
+        const localUser = {
+          id: 'usr-' + Date.now(),
+          name: name.trim(),
+          email: cleanEmail,
+          password: cleanPass,
+          role: 'user',
+          phone: (phone || '').trim(),
+          city: (city || 'Caracas').trim(),
+          cedula: (cedula || '').trim(),
+          createdAt: new Date().toISOString()
+        };
 
-      try {
         const existing = JSON.parse(localStorage.getItem('atlas_registered_users') || '[]');
         if (existing.some((u) => u.email.toLowerCase() === cleanEmail)) {
           setAuthError('Este correo electrónico ya está registrado.');
@@ -276,15 +314,17 @@ export const AuthProvider = ({ children }) => {
         }
         existing.push(localUser);
         localStorage.setItem('atlas_registered_users', JSON.stringify(existing));
-      } catch (e) {
-        console.error(e);
+
+        setCurrentUser(localUser);
+        setCurrentView('store');
+        setIsAuthModalOpen(false);
+        setAuthLoading(false);
+        return true;
       }
 
-      setCurrentUser(localUser);
-      setCurrentView('store');
-      setIsAuthModalOpen(false);
+      setAuthError('No se pudo completar el registro. Verifica los datos e intenta de nuevo.');
       setAuthLoading(false);
-      return true;
+      return false;
     }
   };
 
@@ -322,15 +362,6 @@ export const AuthProvider = ({ children }) => {
     setCurrentView('store');
   };
 
-  // Quick 1-click test helpers
-  const loginQuickAdmin = () => {
-    login('admin@atlas.com', 'atlas2026');
-  };
-
-  const loginQuickClient = () => {
-    login('cliente@atlas.com', 'cliente123');
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -344,9 +375,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        updateUserProfile,
-        loginQuickAdmin,
-        loginQuickClient
+        updateUserProfile
       }}
     >
       {children}
