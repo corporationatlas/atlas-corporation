@@ -21,10 +21,12 @@ import {
   ShieldCheck,
   ExternalLink,
   ChevronRight,
-  AlertCircle
+  AlertCircle,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAdmin } from '../context/AdminContext';
+import { ProformaInvoiceModal } from './ProformaInvoiceModal';
 
 export const UserPortal = () => {
   const { currentUser, setCurrentView, logout, updateUserProfile } = useAuth();
@@ -32,6 +34,8 @@ export const UserPortal = () => {
 
   // Tabs: 'orders' | 'tracking' | 'profile'
   const [activeTab, setActiveTab] = useState('orders');
+  const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState(null);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const fileInputRef = useRef(null);
 
   // Formulario de datos básicos
@@ -377,6 +381,19 @@ export const UserPortal = () => {
                               ${order.total ? order.total.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'} USD
                             </span>
                           </div>
+
+                          {/* Botón Factura Proforma Oficial */}
+                          <button
+                            onClick={() => {
+                              setSelectedInvoiceOrder(order);
+                              setIsInvoiceOpen(true);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10 shadow-sm"
+                            title="Ver e Imprimir Factura Proforma en PDF"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Factura Proforma</span>
+                          </button>
 
                           {/* Botón destacado: Abrir Mapa de Seguimiento */}
                           <button
@@ -849,6 +866,13 @@ export const UserPortal = () => {
         )}
 
       </main>
+
+      {/* Modal Factura Proforma Oficial */}
+      <ProformaInvoiceModal
+        isOpen={isInvoiceOpen}
+        onClose={() => setIsInvoiceOpen(false)}
+        order={selectedInvoiceOrder}
+      />
     </div>
   );
 };

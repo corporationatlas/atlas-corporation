@@ -20,10 +20,13 @@ import {
   Send,
   Sparkles,
   X,
-  AlertTriangle
+  AlertTriangle,
+  CreditCard,
+  QrCode
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { useAuth } from '../context/AuthContext';
+import { ProformaInvoiceModal } from './ProformaInvoiceModal';
 
 export const AdminPortal = () => {
   const {
@@ -49,6 +52,8 @@ export const AdminPortal = () => {
   const { currentUser, setCurrentView, logout } = useAuth();
 
   const [activeTab, setActiveTab] = useState('vehicles'); // 'vehicles' | 'lines' | 'orders' | 'settings'
+  const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState(null);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
   const [editingVehicleId, setEditingVehicleId] = useState(null);
 
@@ -544,19 +549,33 @@ export const AdminPortal = () => {
                       </div>
                     </div>
 
-                    {/* Actions: WhatsApp & Delete */}
-                    <div className="pt-2 flex items-center justify-between border-t border-white/5">
-                      {order.telefono ? (
-                        <a
-                          href={`https://wa.me/${order.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${order.nombre}, le escribimos de Atlas respecto a su solicitud de procura ${order.id}.`)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-sm"
+                    {/* Actions: Factura Proforma, WhatsApp & Delete */}
+                    <div className="pt-2 flex items-center justify-between border-t border-white/5 flex-wrap gap-2">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedInvoiceOrder(order);
+                            setIsInvoiceOpen(true);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10 shadow-sm"
+                          title="Ver Factura Proforma Oficial"
                         >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                          <span>Contactar por WhatsApp</span>
-                        </a>
-                      ) : <div />}
+                          <FileText className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Ver Factura Proforma</span>
+                        </button>
+
+                        {order.telefono ? (
+                          <a
+                            href={`https://wa.me/${order.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${order.nombre}, le escribimos de Atlas respecto a su solicitud de procura ${order.id}.`)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-sm"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                            <span>WhatsApp</span>
+                          </a>
+                        ) : null}
+                      </div>
 
                       <button
                         onClick={() => deleteOrder(order.id)}
@@ -642,6 +661,52 @@ export const AdminPortal = () => {
                   onChange={(e) => setSettingsForm({ ...settingsForm, announcement: e.target.value })}
                   className="w-full px-3.5 py-2 text-xs bg-[#1a1c27] border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/20"
                 />
+              </div>
+
+              {/* Pasarelas de Pago Oficiales (Binance Pay & PayPal) */}
+              <div className="pt-4 border-t border-white/10 space-y-3">
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                  <CreditCard className="w-4 h-4 text-amber-400" />
+                  <span>Configuración de Pasarelas de Pago (Binance Pay & PayPal)</span>
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">Binance Pay ID</label>
+                    <input
+                      type="text"
+                      placeholder="395610250"
+                      value={settingsForm.binancePayId || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, binancePayId: e.target.value })}
+                      className="w-full px-3.5 py-2 text-xs bg-[#1a1c27] border border-white/10 rounded-xl text-white font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">Correo de PayPal</label>
+                    <input
+                      type="email"
+                      placeholder="corporationatlas969@gmail.com"
+                      value={settingsForm.paypalEmail || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, paypalEmail: e.target.value })}
+                      className="w-full px-3.5 py-2 text-xs bg-[#1a1c27] border border-white/10 rounded-xl text-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">ID de Cliente PayPal (Client ID oficial de Odoo)</label>
+                  <input
+                    type="text"
+                    placeholder="AboPQ2P4y9JdreIAjO0Ar_..."
+                    value={settingsForm.paypalClientId || ''}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, paypalClientId: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs bg-[#1a1c27] border border-white/10 rounded-xl text-white font-mono text-[11px]"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-1 block">
+                    Conectado con PayPal Developer Dashboard (mismo ID configurado en tu panel de Odoo).
+                  </span>
+                </div>
               </div>
 
               <div className="pt-2 flex items-center justify-between">
@@ -851,6 +916,12 @@ export const AdminPortal = () => {
         </div>
       )}
 
+      {/* Modal Factura Proforma Oficial */}
+      <ProformaInvoiceModal
+        isOpen={isInvoiceOpen}
+        onClose={() => setIsInvoiceOpen(false)}
+        order={selectedInvoiceOrder}
+      />
     </div>
   );
 };

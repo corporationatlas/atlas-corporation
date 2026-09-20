@@ -19,7 +19,11 @@ const initialCompanyInfo = {
   whatsapp: '584222932455',
   address: 'Atención digital y procura internacional para toda Venezuela',
   ownerName: 'Corporation Atlas Admin',
-  announcement: '✨ Promoción Especial: Envío asegurado y gestión de placas en Venezuela incluido.'
+  announcement: '✨ Promoción Especial: Envío asegurado y gestión de placas en Venezuela incluido.',
+  binancePayId: '395610250',
+  paypalEmail: 'corporationatlas969@gmail.com',
+  paypalClientId: 'AboPQ2P4y9JdreIAjO0Ar_1nfS-Cg081MgaZFUKeSYE7rICtEdBT4XA-IWxFSWjp',
+  paypalWebhookId: '0YU42284E4242394H'
 };
 
 const initialSampleOrders = [

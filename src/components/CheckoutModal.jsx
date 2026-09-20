@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAdmin } from '../context/AdminContext';
+import { ProformaInvoiceModal } from './ProformaInvoiceModal';
 
 export const CheckoutModal = ({ isOpen, onClose }) => {
   const { cart, total, clearCart } = useCart();
@@ -27,6 +28,8 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [trackingId, setTrackingId] = useState('');
   const [copiedId, setCopiedId] = useState(false);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+  const [createdOrderData, setCreatedOrderData] = useState(null);
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -60,7 +63,7 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
       setIsProcessing(false);
       setStep(3);
 
-      addOrder({
+      const orderRecord = {
         id: generatedTracking,
         date: new Date().toISOString().split('T')[0],
         nombre: formData.nombre,
@@ -73,9 +76,11 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
         vehiculo: cart.map((i) => i.product.name).join(', ') || 'Vehículo bajo demanda',
         total: total,
         metodoPago: formData.metodoPago,
-        status: 'Cotización enviada'
-      });
+        status: 'Cotización / Preorden emitida'
+      };
 
+      setCreatedOrderData(orderRecord);
+      addOrder(orderRecord);
       clearCart();
     }, 1200);
   };
@@ -431,6 +436,18 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
+                {/* Botón Factura Proforma Oficial */}
+                <div className="max-w-sm mx-auto pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsInvoiceOpen(true)}
+                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-xs transition-all shadow-xl flex items-center justify-center gap-2 active:scale-98"
+                  >
+                    <FileText className="w-4 h-4 text-black" />
+                    <span>Descargar / Imprimir Factura Proforma (PDF)</span>
+                  </button>
+                </div>
+
                 {/* Acciones para enviar comprobante */}
                 <div className="p-4 rounded-2xl bg-[#11131e] border border-white/10 max-w-sm mx-auto space-y-2.5 text-xs">
                   <p className="text-slate-300 font-bold text-[11px]">
@@ -473,6 +490,13 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
 
         </div>
       </div>
+
+      {/* Modal Factura Proforma Oficial */}
+      <ProformaInvoiceModal
+        isOpen={isInvoiceOpen}
+        onClose={() => setIsInvoiceOpen(false)}
+        order={createdOrderData}
+      />
     </div>
   );
 };
