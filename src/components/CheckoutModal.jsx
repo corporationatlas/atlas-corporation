@@ -22,7 +22,7 @@ import { ProformaInvoiceModal } from './ProformaInvoiceModal';
 
 export const CheckoutModal = ({ isOpen, onClose }) => {
   const { cart, total, clearCart } = useCart();
-  const { addOrder } = useAdmin();
+  const { addOrder, getNextOrderNumber } = useAdmin();
   
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -58,7 +58,7 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
     setIsProcessing(true);
 
     setTimeout(() => {
-      const generatedTracking = 'ATL-' + Math.floor(100000 + Math.random() * 900000) + '-VE';
+      const generatedTracking = getNextOrderNumber ? getNextOrderNumber() : 'S00001';
       setTrackingId(generatedTracking);
       setIsProcessing(false);
       setStep(3);
@@ -415,7 +415,7 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                 {/* Recibo de Procura */}
                 <div className="bg-[#181a24] p-4 rounded-2xl border border-white/10 text-left text-xs space-y-2 max-w-sm mx-auto">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Código de Rastreo Atlas:</span>
+                    <span className="text-slate-400">Pedido & Referencia:</span>
                     <span className="font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded">{trackingId}</span>
                   </div>
                   <div className="flex justify-between">

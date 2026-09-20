@@ -26,38 +26,7 @@ const initialCompanyInfo = {
   paypalWebhookId: '0YU42284E4242394H'
 };
 
-const initialSampleOrders = [
-  {
-    id: 'ATL-783921-VE',
-    date: '2026-09-18',
-    nombre: 'Carlos Mendoza',
-    cedula: 'V-18.942.311',
-    email: 'cliente@atlas.com',
-    telefono: '+58 414 5551234',
-    ciudad: 'Valencia',
-    estado: 'Carabobo',
-    direccionEntrega: 'Urb. El Parral, Calle 137',
-    vehiculo: 'Atlas Apex 250 Sport R',
-    total: 2450.00,
-    metodoPago: 'Plan Procura (40% + 60%)',
-    status: 'En trámite de embarque'
-  },
-  {
-    id: 'ATL-612940-VE',
-    date: '2026-09-17',
-    nombre: 'Valeria Briceño',
-    cedula: 'V-21.405.882',
-    email: 'valeria.b@email.com',
-    telefono: '+58 412 8899221',
-    ciudad: 'Caracas',
-    estado: 'Distrito Capital',
-    direccionEntrega: 'Av. Libertador, Torre Humboldt',
-    vehiculo: 'Atlas Titan 150 EcoMax',
-    total: 1350.00,
-    metodoPago: 'Transferencia Bancaria USD',
-    status: 'Cotización enviada'
-  }
-];
+const initialSampleOrders = [];
 
 export const AdminProvider = ({ children }) => {
   // 1. Vehículos de trabajo (Borrador de edición)
@@ -111,10 +80,10 @@ export const AdminProvider = ({ children }) => {
   // 3. Solicitudes / Órdenes recibidas de clientes
   const [ordersList, setOrdersList] = useState(() => {
     try {
-      const saved = localStorage.getItem('atlas_orders_v2');
-      return saved ? JSON.parse(saved) : initialSampleOrders;
+      const saved = localStorage.getItem('atlas_orders_v3');
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return initialSampleOrders;
+      return [];
     }
   });
 
@@ -161,7 +130,7 @@ export const AdminProvider = ({ children }) => {
   }, [companyInfo]);
 
   useEffect(() => {
-    localStorage.setItem('atlas_orders_v2', JSON.stringify(ordersList));
+    localStorage.setItem('atlas_orders_v3', JSON.stringify(ordersList));
   }, [ordersList]);
 
   useEffect(() => {
@@ -240,9 +209,37 @@ export const AdminProvider = ({ children }) => {
     setHasUnpublishedChanges(true);
   };
 
+  // Generador de código correlativo secuencial (arranca en S00001)
+  const getNextOrderNumber = () => {
+    try {
+      const raw = localStorage.getItem('atlas_order_counter_seq');
+      const current = raw !== null ? parseInt(raw, 10) : 0;
+      const next = current + 1;
+      localStorage.setItem('atlas_order_counter_seq', next.toString());
+      return `S${String(next).padStart(5, '0')}`;
+    } catch {
+      return 'S00001';
+    }
+  };
+
+  const resetOrderCounter = (startVal = 0) => {
+    try {
+      localStorage.setItem('atlas_order_counter_seq', startVal.toString());
+      console.log('Contador de órdenes restablecido a:', startVal);
+    } catch (err) {
+      console.warn('Error restableciendo contador:', err);
+    }
+  };
+
+  const clearOrdersHistory = () => {
+    setOrdersList([]);
+    localStorage.removeItem('atlas_orders_v3');
+    resetOrderCounter(0);
+  };
+
   // Acciones sobre Órdenes (Sincronizadas con Cloud Firestore en tiempo real)
   const addOrder = async (order) => {
-    const orderId = order.id || ('ATL-' + Date.now() + '-VE');
+    const orderId = order.id || getNextOrderNumber();
     const enrichedOrder = {
       ...order,
       id: orderId,
@@ -353,6 +350,9 @@ export const AdminProvider = ({ children }) => {
         addOrder,
         updateOrderStatus,
         deleteOrder,
+        getNextOrderNumber,
+        resetOrderCounter,
+        clearOrdersHistory,
         resetToDefaults
       }}
     >

@@ -43,6 +43,8 @@ export const AdminPortal = () => {
     updateOrderStatus,
     deleteOrder,
     resetToDefaults,
+    resetOrderCounter,
+    clearOrdersHistory,
     hasUnpublishedChanges,
     publishChanges,
     discardDraftChanges,
@@ -477,11 +479,42 @@ export const AdminPortal = () => {
         {/* ================= TAB 3: COTIZACIONES RECIBIDAS ================= */}
         {activeTab === 'orders' && (
           <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-black text-white">Solicitudes de Clientes & Actualización de Envíos</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Al cambiar el estado de un pedido aquí, el cliente verá avanzar automáticamente su barra de progreso en su Panel de Usuario.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-black text-white">Solicitudes de Clientes & Actualización de Envíos</h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Al cambiar el estado de un pedido aquí, el cliente verá avanzar automáticamente su barra de progreso en su Panel de Usuario.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (window.confirm('¿Deseas reiniciar el contador de facturas y pedidos a S00001?')) {
+                      resetOrderCounter(0);
+                      alert('Contador restablecido con éxito. El próximo pedido será S00001.');
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 text-xs font-bold transition-all border border-white/10"
+                  title="Restablecer correlativo a S00001"
+                >
+                  Reiniciar Contador a S00001
+                </button>
+
+                {ordersList.length > 0 && (
+                  <button
+                    onClick={() => {
+                      if (window.confirm('¿Deseas eliminar todo el historial de pedidos de prueba y reiniciar el contador en S00001?')) {
+                        clearOrdersHistory();
+                      }
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold transition-all border border-red-500/20"
+                    title="Limpiar pedidos de prueba"
+                  >
+                    Limpiar Pruebas
+                  </button>
+                )}
+              </div>
             </div>
 
             {ordersList.length === 0 ? (

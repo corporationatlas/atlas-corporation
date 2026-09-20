@@ -28,12 +28,19 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
   };
 
   // Código correlativo corto estilo Odoo S0000X o el ID de orden
-  const orderRef = order.id ? (order.id.startsWith('ATL-') ? `S${order.id.replace('ATL-', '').replace('-VE', '')}` : order.id) : 'S00005';
+  const orderRef = order.id ? (order.id.startsWith('ATL-') ? `S${order.id.replace('ATL-', '').replace('-VE', '')}` : order.id) : 'S00001';
   const orderDate = order.date || new Date().toISOString().split('T')[0];
   const totalAmount = order.total || 0;
   const formattedTotal = totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
   const advanceAmount = (totalAmount * 0.4).toLocaleString('en-US', { minimumFractionDigits: 2 });
   const balanceAmount = (totalAmount * 0.6).toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+  // Detección estricta del método de pago elegido para mostrar únicamente ese canal
+  const paymentMethodRaw = (order.metodoPago || '').toLowerCase();
+  const isPayPal = paymentMethodRaw.includes('paypal');
+  const isTransfer = paymentMethodRaw.includes('transferencia') || paymentMethodRaw.includes('bancari') || paymentMethodRaw.includes('cable');
+  const isPlanProcura = paymentMethodRaw.includes('procura') || paymentMethodRaw.includes('inicial') || paymentMethodRaw.includes('40%');
+  const isBinance = paymentMethodRaw.includes('binance') || paymentMethodRaw.includes('usdt') || (!isPayPal && !isTransfer && !isPlanProcura);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 print:p-0 print:bg-white print:static">
@@ -128,47 +135,114 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
                   Confirmaremos su pedido una vez que se haya confirmado el pago.
                 </p>
 
-                {/* Recuadro de Medios de Pago Directos */}
+                {/* Recuadro del Medio de Pago Seleccionado por el Cliente */}
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3 my-4">
                   <span className="text-xs font-bold text-slate-900 block uppercase tracking-wider">
-                    Canales de Pago para Liquidar su Pedido:
+                    Canal de Pago para Liquidar su Pedido:
                   </span>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    {/* Binance Pay */}
-                    <div className="p-3 bg-white rounded-lg border border-slate-300 space-y-1">
-                      <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                        <QrCode className="w-4 h-4 text-amber-600" />
-                        <span>Binance Pay / USDT</span>
+                  {/* Binance Pay / USDT */}
+                  {isBinance && (
+                    <div className="p-3.5 bg-white rounded-xl border border-slate-300 space-y-2 text-xs">
+                      <div className="font-bold text-slate-900 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <QrCode className="w-4 h-4 text-amber-600" />
+                          <span className="text-sm">Binance Pay / USDT</span>
+                        </div>
+                        <span className="text-[10px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded">
+                          Criptoactivo Seguro
+                        </span>
                       </div>
-                      <p className="text-slate-600 text-[11px]">
-                        Pay ID: <strong className="text-black font-mono text-xs">395610250</strong>
+                      <p className="text-slate-700">
+                        Pay ID Oficial: <strong className="text-black font-mono text-sm">395610250</strong>
                       </p>
-                      <p className="text-[10px] text-slate-500">
-                        Concepto: <strong>{orderRef}</strong>
+                      <p className="text-slate-600">
+                        Concepto / Nota obligatoria: <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
+                      </p>
+                      <p className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-100 leading-relaxed">
+                        Abre Binance en tu teléfono celular, ingresa en Pay con el ID <strong>395610250</strong> y envía el monto en USDT colocando el código <strong>{orderRef}</strong> en la nota del pago.
                       </p>
                     </div>
+                  )}
 
-                    {/* PayPal */}
-                    <div className="p-3 bg-white rounded-lg border border-slate-300 space-y-1">
-                      <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                        <CreditCard className="w-4 h-4 text-blue-600" />
-                        <span>PayPal (USD / Tarjeta)</span>
+                  {/* PayPal */}
+                  {isPayPal && (
+                    <div className="p-3.5 bg-white rounded-xl border border-slate-300 space-y-2 text-xs">
+                      <div className="font-bold text-slate-900 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <CreditCard className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm">PayPal (USD / Tarjeta Internacional)</span>
+                        </div>
+                        <span className="text-[10px] font-bold bg-blue-100 text-blue-900 px-2 py-0.5 rounded">
+                          Pago Seguro USD
+                        </span>
                       </div>
-                      <p className="text-slate-600 text-[11px]">
-                        Cuenta: <strong className="text-black font-mono text-xs">corporationatlas969@gmail.com</strong>
+                      <p className="text-slate-700">
+                        Cuenta Corporativa: <strong className="text-black font-mono text-xs sm:text-sm">corporationatlas969@gmail.com</strong>
                       </p>
-                      <p className="text-[10px] text-slate-500">
-                        Nota: <strong>{orderRef}</strong>
+                      <p className="text-slate-600">
+                        Nota de la transacción: <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
+                      </p>
+                      <p className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-100 leading-relaxed">
+                        Al enviar tu pago por PayPal, recuerda incluir el código <strong>{orderRef}</strong> en la nota o concepto para conciliar tu compra inmediatamente.
                       </p>
                     </div>
-                  </div>
+                  )}
 
-                  {order.metodoPago?.toLowerCase().includes('procura') || order.metodoPago?.toLowerCase().includes('inicial') ? (
-                    <div className="text-[11px] text-slate-600 pt-1 border-t border-slate-200">
-                      <strong>Plan Procura:</strong> 40% Anticipo de Zarpe (${advanceAmount} USD) + 60% Saldo al Arribo en Venezuela (${balanceAmount} USD).
+                  {/* Transferencia Bancaria Internacional */}
+                  {isTransfer && (
+                    <div className="p-3.5 bg-white rounded-xl border border-slate-300 space-y-2 text-xs">
+                      <div className="font-bold text-slate-900 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <Building2 className="w-4 h-4 text-emerald-600" />
+                          <span className="text-sm">Transferencia Bancaria Internacional / Cable USD</span>
+                        </div>
+                        <span className="text-[10px] font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">
+                          Cuenta Custodia
+                        </span>
+                      </div>
+                      <p className="text-slate-700">
+                        Beneficiario: <strong className="text-black font-semibold">Corporation Atlas C.A.</strong>
+                      </p>
+                      <p className="text-slate-600">
+                        Referencia obligatoria: <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
+                      </p>
+                      <p className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-100 leading-relaxed">
+                        Comunícate a nuestro WhatsApp corporativo indicando tu referencia <strong>{orderRef}</strong> para suministrarte los datos SWIFT/IBAN de liquidación.
+                      </p>
                     </div>
-                  ) : null}
+                  )}
+
+                  {/* Plan Procura */}
+                  {isPlanProcura && (
+                    <div className="p-3.5 bg-white rounded-xl border border-slate-300 space-y-2 text-xs">
+                      <div className="font-bold text-slate-900 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <Receipt className="w-4 h-4 text-purple-600" />
+                          <span className="text-sm">Plan Procura: 40% Anticipo + Saldo al Puerto</span>
+                        </div>
+                        <span className="text-[10px] font-bold bg-purple-100 text-purple-900 px-2 py-0.5 rounded">
+                          Modalidad Fraccionada
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                        <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                          <span className="text-[10px] text-slate-500 block font-semibold">40% Anticipo de Zarpe:</span>
+                          <strong className="text-black font-mono text-sm font-bold">${advanceAmount} USD</strong>
+                        </div>
+                        <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                          <span className="text-[10px] text-slate-500 block font-semibold">60% Saldo al Arribo en VE:</span>
+                          <strong className="text-black font-mono text-sm font-bold">${balanceAmount} USD</strong>
+                        </div>
+                      </div>
+                      <p className="text-slate-600 pt-1">
+                        Referencia del Pedido: <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
+                      </p>
+                      <p className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-100 leading-relaxed">
+                        Puedes liquidar el 40% de anticipo (${advanceAmount} USD) vía Binance Pay ID (395610250) o PayPal (corporationatlas969@gmail.com) indicando la referencia <strong>{orderRef}</strong>.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <p>
@@ -188,19 +262,9 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
               {/* Línea divisoria inferior */}
               <hr className="border-t border-slate-300 my-4" />
 
-              {/* Pie de Firma Odoo */}
-              <div className="space-y-0.5 text-xs text-slate-600">
-                <p className="font-bold text-slate-900 text-sm">
-                  Atlas corporation
-                </p>
-                <p>
-                  <a href="mailto:corporationatlas969@gmail.com" className="text-blue-600 hover:underline">
-                    corporationatlas969@gmail.com
-                  </a>
-                </p>
-                <p className="text-[11px] text-slate-500">
-                  WhatsApp: +58 422 293 2455 • Caracas / Valencia / Puerto Cabello, Venezuela
-                </p>
+              {/* Pie de página final */}
+              <div className="text-center text-xs text-slate-600 font-medium py-1">
+                WhatsApp: +58 422 293 2455 • Caracas
               </div>
 
             </div>
@@ -325,13 +389,18 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
               <div className="pt-6 border-t border-slate-300 flex justify-between items-end text-[10px] text-slate-600">
                 <div>
                   <p className="font-bold text-black">Corporation Atlas C.A.</p>
-                  <p>corporationatlas969@gmail.com • +58 422 293 2455</p>
+                  <p>WhatsApp: +58 422 293 2455 • Caracas</p>
                 </div>
                 <div className="text-right">
                   <div className="w-36 border-b border-slate-400 mb-1"></div>
                   <p className="font-bold text-black">Firma y Sello Autorizado</p>
                   <p>Departamento de Importación & Logística</p>
                 </div>
+              </div>
+
+              {/* Pie de página unificado */}
+              <div className="text-center text-xs text-slate-600 font-medium pt-3 border-t border-slate-200">
+                WhatsApp: +58 422 293 2455 • Caracas
               </div>
 
             </div>
