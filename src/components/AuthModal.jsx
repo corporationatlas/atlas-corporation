@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, User, Phone, MapPin, ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react';
+import { X, Lock, Mail, User, Phone, MapPin, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const AuthModal = () => {
@@ -34,11 +34,6 @@ export const AuthModal = () => {
     e.preventDefault();
     register(registerData);
   };
-
-  const isAdminEmail = 
-    loginData.email.trim().toLowerCase() === 'corporationatlas969@gmail.com' ||
-    loginData.email.trim().toLowerCase() === 'admin@atlas.com' ||
-    loginData.email.trim().toLowerCase() === 'admin@corporationatlas.com';
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -108,18 +103,10 @@ export const AuthModal = () => {
             <div className="space-y-4">
               <form onSubmit={handleLoginSubmit} className="space-y-3.5">
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Correo Electrónico</span>
-                    </label>
-                    {isAdminEmail && (
-                      <span className="text-[10px] text-amber-400 font-bold bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3 text-amber-400" />
-                        <span>Portal Admin</span>
-                      </span>
-                    )}
-                  </div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Correo Electrónico</span>
+                  </label>
                   <input
                     type="email"
                     required
@@ -133,7 +120,7 @@ export const AuthModal = () => {
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{isAdminEmail ? 'Contraseña de Administrador' : 'Contraseña'}</span>
+                    <span>Contraseña</span>
                   </label>
                   <input
                     type="password"
@@ -158,7 +145,7 @@ export const AuthModal = () => {
                     <span>Verificando credenciales...</span>
                   ) : (
                     <>
-                      <span>{isAdminEmail ? 'Acceder al Panel de Control (Admin)' : 'Ingresar a ATLAS'}</span>
+                      <span>Ingresar a ATLAS</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </>
                   )}

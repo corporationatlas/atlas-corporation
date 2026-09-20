@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }) => {
         return { success: true, role: 'admin' };
       } else {
         // Bloqueo estricto: NUNCA continuar hacia autenticación de usuario regular
-        setAuthError('Contraseña de Administrador incorrecta. Acceso restringido.');
+        setAuthError('Contraseña incorrecta. Por favor verifica tus credenciales.');
         setAuthLoading(false);
         return { success: false };
       }

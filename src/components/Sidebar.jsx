@@ -167,7 +167,7 @@ export const Sidebar = ({
                 {currentUser.role === 'admin' ? (
                   <>
                     <ShieldAlert className="w-3.5 h-3.5 text-slate-900" />
-                    <span>Panel de Dueño (CMS)</span>
+                    <span>Gestionar Tienda</span>
                   </>
                 ) : (
                   <>
@@ -178,7 +178,7 @@ export const Sidebar = ({
               </button>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div>
               {/* Clean Action Button: Rastrear mi Vehículo */}
               <button
                 onClick={() => setIsAuthModalOpen(true)}
@@ -186,15 +186,6 @@ export const Sidebar = ({
               >
                 <span className="text-slate-100 font-bold tracking-wide">Rastrear mi Vehículo</span>
                 <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
-              </button>
-
-              {/* Botón de acceso de Administrador */}
-              <button
-                onClick={() => setIsAuthModalOpen(true)}
-                className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-[11px] font-semibold transition-all flex items-center justify-center gap-1.5 border border-white/5"
-              >
-                <ShieldAlert className="w-3.5 h-3.5 text-slate-400" />
-                <span>Acceso Administrador</span>
               </button>
             </div>
           )}

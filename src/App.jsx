@@ -110,29 +110,6 @@ function AtlasPublicStore() {
           </button>
         </div>
       </div>
-
-      {/* Floating Role Quick Switcher Badge */}
-      {currentUser && (
-        <div className="fixed bottom-5 left-5 z-40">
-          <button
-            onClick={() => setCurrentView(currentUser.role === 'admin' ? 'admin-portal' : 'user-portal')}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-black text-xs font-black shadow-2xl hover:scale-105 transition-all border border-white/20 group"
-          >
-            {currentUser.role === 'admin' ? (
-              <>
-                <ShieldAlert className="w-4 h-4 text-amber-600" />
-                <span>Panel de Dueño (CMS)</span>
-              </>
-            ) : (
-              <>
-                <Package className="w-4 h-4 text-emerald-600" />
-                <span>Mis Pedidos</span>
-              </>
-            )}
-          </button>
-        </div>
-      )}
-
       {/* Left Sidebar Navigation */}
       <Sidebar
         searchQuery={searchQuery}
