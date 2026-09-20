@@ -17,40 +17,73 @@
 
 /* ================= PRINT ISOLATION FOR INVOICES ================= */
 @media print {
+  @page {
+    size: letter portrait;
+    margin: 12mm 15mm 15mm 15mm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   html, body {
-    background: white !important;
-    color: #111827 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
   }
 
-  /* Hide entire page */
-  body * {
-    visibility: hidden !important;
+  /* Ocultar elementos de interfaz no imprimibles */
+  .no-print,
+  #debug-error-box,
+  aside,
+  header,
+  nav,
+  button,
+  .backdrop-blur-sm {
+    display: none !important;
   }
 
-  /* Show ONLY the printable invoice container */
-  #printable-document-container,
-  #printable-document-container * {
+  /* Desactivar recortes y animaciones de modales en modo impresión */
+  body:has(#printable-document-container) #root > div:not(:has(#printable-document-container)) {
+    display: none !important;
+  }
+
+  .fixed,
+  .relative,
+  [class*="overflow-"],
+  [class*="animate-"] {
+    position: static !important;
+    overflow: visible !important;
+    transform: none !important;
+    animation: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  /* Contenedor del documento imprimible */
+  #printable-document-container {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 760px !important;
+    margin: 0 auto !important;
+    padding: 10px 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
     visibility: visible !important;
   }
 
-  #printable-document-container {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 28px !important;
-    background: white !important;
-    color: #111827 !important;
-    box-shadow: none !important;
-    border: none !important;
-    display: block !important;
-  }
-
-  .no-print {
-    display: none !important;
+  #printable-document-container * {
+    visibility: visible !important;
   }
 }
 

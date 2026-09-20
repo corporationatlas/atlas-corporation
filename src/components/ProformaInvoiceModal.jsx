@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Printer,
@@ -21,26 +21,166 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
   const [docType, setDocType] = useState('notice');
   const [copiedId, setCopiedId] = useState(false);
 
-  if (!isOpen || !order) return null;
-
-  const handlePrint = () => {
-    window.print();
-  };
-
   // Código correlativo corto estilo Odoo S0000X o el ID de orden
-  const orderRef = order.id ? (order.id.startsWith('ATL-') ? `S${order.id.replace('ATL-', '').replace('-VE', '')}` : order.id) : 'S00001';
-  const orderDate = order.date || new Date().toISOString().split('T')[0];
-  const totalAmount = order.total || 0;
+  const orderRef = order?.id ? (order.id.startsWith('ATL-') ? `S${order.id.replace('ATL-', '').replace('-VE', '')}` : order.id) : 'S00001';
+  const orderDate = order?.date || new Date().toISOString().split('T')[0];
+  const totalAmount = order?.total || 0;
   const formattedTotal = totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
   const advanceAmount = (totalAmount * 0.4).toLocaleString('en-US', { minimumFractionDigits: 2 });
   const balanceAmount = (totalAmount * 0.6).toLocaleString('en-US', { minimumFractionDigits: 2 });
 
   // Detección estricta del método de pago elegido para mostrar únicamente ese canal
-  const paymentMethodRaw = (order.metodoPago || '').toLowerCase();
+  const paymentMethodRaw = (order?.metodoPago || '').toLowerCase();
   const isPayPal = paymentMethodRaw.includes('paypal');
   const isTransfer = paymentMethodRaw.includes('transferencia') || paymentMethodRaw.includes('bancari') || paymentMethodRaw.includes('cable');
   const isPlanProcura = paymentMethodRaw.includes('procura') || paymentMethodRaw.includes('inicial') || paymentMethodRaw.includes('40%');
   const isBinance = paymentMethodRaw.includes('binance') || paymentMethodRaw.includes('usdt') || (!isPayPal && !isTransfer && !isPlanProcura);
+
+  // Impresión aislada garantizada mediante Iframe para evitar páginas en blanco por estilos del modal
+  const handlePrint = () => {
+    const container = document.getElementById('printable-document-container');
+    if (!container) {
+      window.print();
+      return;
+    }
+
+    try {
+      // Eliminar iframe previo si existía
+      const oldFrame = document.getElementById('atlas-invoice-print-frame');
+      if (oldFrame) {
+        oldFrame.remove();
+      }
+
+      // Crear iframe invisible aislado
+      const printFrame = document.createElement('iframe');
+      printFrame.id = 'atlas-invoice-print-frame';
+      printFrame.style.position = 'fixed';
+      printFrame.style.right = '0';
+      printFrame.style.bottom = '0';
+      printFrame.style.width = '0';
+      printFrame.style.height = '0';
+      printFrame.style.border = '0';
+      printFrame.style.visibility = 'hidden';
+      document.body.appendChild(printFrame);
+
+      const frameDoc = printFrame.contentWindow.document;
+
+      // Extraer estilos cargados en la página (Tailwind CSS, fuentes y layouts)
+      const currentStyles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+        .map(style => style.outerHTML)
+        .join('\n');
+
+      frameDoc.open();
+      frameDoc.write(`
+        <!DOCTYPE html>
+        <html lang="es">
+          <head>
+            <meta charset="utf-8" />
+            <title>Atlas - ${docType === 'notice' ? 'Aviso de Pedido' : 'Factura'} ${orderRef}</title>
+            ${currentStyles}
+            <style>
+              @page {
+                size: letter portrait;
+                margin: 12mm 15mm 15mm 15mm;
+              }
+              * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                box-sizing: border-box;
+              }
+              html, body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                font-size: 13px;
+                line-height: 1.5;
+              }
+              #atlas-print-wrapper {
+                width: 100% !important;
+                max-width: 720px !important;
+                margin: 0 auto !important;
+                padding: 10px 0 !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+              }
+              .no-print {
+                display: none !important;
+              }
+            </style>
+          </head>
+          <body>
+            <div id="atlas-print-wrapper">
+              ${container.innerHTML}
+            </div>
+          </body>
+        </html>
+      `);
+      frameDoc.close();
+
+      const triggerPrint = () => {
+        try {
+          printFrame.contentWindow.focus();
+          printFrame.contentWindow.print();
+        } catch (e) {
+          console.warn('Iframe print falló, usando window.print:', e);
+          window.print();
+        }
+      };
+
+      // Esperar a que los recursos e imágenes terminen de procesarse
+      const imgs = frameDoc.querySelectorAll('img');
+      if (imgs.length > 0) {
+        let loaded = 0;
+        let fired = false;
+        const checkReady = () => {
+          if (fired) return;
+          loaded++;
+          if (loaded >= imgs.length) {
+            fired = true;
+            setTimeout(triggerPrint, 150);
+          }
+        };
+        imgs.forEach(img => {
+          if (img.complete) {
+            checkReady();
+          } else {
+            img.onload = checkReady;
+            img.onerror = checkReady;
+          }
+        });
+        setTimeout(() => {
+          if (!fired) {
+            fired = true;
+            triggerPrint();
+          }
+        }, 500);
+      } else {
+        setTimeout(triggerPrint, 150);
+      }
+    } catch (err) {
+      console.warn('Error en impresión por iframe:', err);
+      window.print();
+    }
+  };
+
+  // Interceptar Ctrl+P o Cmd+P mientras el modal esté abierto para usar la impresión limpia
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+        e.preventDefault();
+        handlePrint();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, docType, orderRef]);
+
+  if (!isOpen || !order) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 print:p-0 print:bg-white print:static">
