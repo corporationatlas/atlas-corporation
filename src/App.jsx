@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { CartProvider, useCart } from './context/CartContext';
 import { AdminProvider, useAdmin } from './context/AdminContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { Sidebar } from './components/Sidebar';
 import { HeroAtlas } from './components/HeroAtlas';
 import { ProcurementLines } from './components/ProcurementLines';
@@ -29,6 +30,7 @@ function AtlasPublicStore() {
   const { cartCount, setIsCartOpen } = useCart();
   const { publishedVehicles = [], publishedLines = [] } = useAdmin();
   const { currentUser, setCurrentView, setIsAuthModalOpen } = useAuth();
+  const { language, toggleLanguage } = useLanguage();
 
   // Filtrado reactivo de vehículos publicados
   const filteredVehicles = useMemo(() => {
@@ -96,6 +98,17 @@ function AtlasPublicStore() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Mobile Language Switcher */}
+          <button
+            onClick={toggleLanguage}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/15 text-white text-[10px] font-bold tracking-wider border border-white/10 transition-all active:scale-95"
+            title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+          >
+            <span className={language === 'es' ? 'text-white font-black' : 'text-slate-400 font-medium'}>ES</span>
+            <span className="text-slate-600">|</span>
+            <span className={language === 'en' ? 'text-white font-black' : 'text-slate-400 font-medium'}>EN</span>
+          </button>
+
           <button
             onClick={() => setIsCartOpen(true)}
             className="relative p-2 rounded-full bg-white/10 text-white hover:bg-white/20"
@@ -199,12 +212,14 @@ function MainView() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AdminProvider>
-        <CartProvider>
-          <MainView />
-        </CartProvider>
-      </AdminProvider>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <AdminProvider>
+          <CartProvider>
+            <MainView />
+          </CartProvider>
+        </AdminProvider>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }

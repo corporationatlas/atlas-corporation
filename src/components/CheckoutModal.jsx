@@ -18,11 +18,14 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAdmin } from '../context/AdminContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ProformaInvoiceModal } from './ProformaInvoiceModal';
 
 export const CheckoutModal = ({ isOpen, onClose }) => {
   const { cart, total, clearCart } = useCart();
   const { addOrder, getNextOrderNumber } = useAdmin();
+  const { language, t } = useLanguage();
+  const isEn = language === 'en';
   
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -73,10 +76,10 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
         ciudad: formData.ciudad,
         estado: formData.estado,
         direccionEntrega: formData.direccionEntrega,
-        vehiculo: cart.map((i) => i.product.name).join(', ') || 'Vehículo bajo demanda',
+        vehiculo: cart.map((i) => i.product.name).join(', ') || (isEn ? 'Custom on-demand vehicle' : 'Vehículo bajo demanda'),
         total: total,
         metodoPago: formData.metodoPago,
-        status: 'Cotización / Preorden emitida'
+        status: isEn ? 'Quote / Preorder issued' : 'Cotización / Preorden emitida'
       };
 
       setCreatedOrderData(orderRecord);
@@ -105,17 +108,21 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
           <div className="p-6 border-b border-white/10 flex items-center justify-between bg-[#0e0f14]">
             <div>
               <h2 className="text-lg font-black text-white">
-                {step === 3 ? '¡Solicitud de Procura Confirmada!' : 'Formalizar Procura e Importación'}
+                {step === 3
+                  ? (isEn ? 'Procurement Request Confirmed!' : '¡Solicitud de Procura Confirmada!')
+                  : (isEn ? 'Formalize Procurement & Import' : 'Formalizar Procura e Importación')}
               </h2>
               {step !== 3 && (
-                <p className="text-xs text-slate-400">Paso {step} de 2 — Trámite directo y seguro para Venezuela</p>
+                <p className="text-xs text-slate-400">
+                  {isEn ? `Step ${step} of 2 — Direct and secure process for Venezuela` : `Paso ${step} de 2 — Trámite directo y seguro para Venezuela`}
+                </p>
               )}
             </div>
 
             <button
               onClick={step === 3 ? handleCloseAndReset : onClose}
               className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-white"
-              aria-label="Cerrar modal"
+              aria-label={t('common.close')}
             >
               <X className="w-5 h-5" />
             </button>
@@ -128,25 +135,29 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
               <form onSubmit={handleNextStep} className="space-y-4">
                 <div className="flex items-center gap-2 pb-2 text-sm font-bold text-slate-200 border-b border-white/5">
                   <MapPin className="w-4 h-4 text-red-500" />
-                  <span>Datos del Titular y Destino de Entrega (Venezuela)</span>
+                  <span>{isEn ? 'Consignee Details and Delivery Destination (Venezuela)' : 'Datos del Titular y Destino de Entrega (Venezuela)'}</span>
                 </div>
 
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">Nombre Completo</label>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        {isEn ? 'Full Name' : 'Nombre Completo'}
+                      </label>
                       <input
                         required
                         type="text"
                         name="nombre"
-                        placeholder="ej. Oscar Ramirez"
+                        placeholder={isEn ? 'e.g. Oscar Ramirez' : 'ej. Oscar Ramirez'}
                         value={formData.nombre}
                         onChange={handleInputChange}
                         className="w-full px-3.5 py-2 text-xs bg-[#1a1c27] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white/20"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">Cédula / RIF</label>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        {isEn ? 'ID / Tax ID / Passport' : 'Cédula / RIF'}
+                      </label>
                       <input
                         required
                         type="text"
@@ -161,19 +172,23 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">Correo Electrónico</label>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        {isEn ? 'Email Address' : 'Correo Electrónico'}
+                      </label>
                       <input
                         required
                         type="email"
                         name="email"
-                        placeholder="oscar@ejemplo.com"
+                        placeholder={isEn ? 'oscar@example.com' : 'oscar@ejemplo.com'}
                         value={formData.email}
                         onChange={handleInputChange}
                         className="w-full px-3.5 py-2 text-xs bg-[#1a1c27] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white/20"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">Teléfono / WhatsApp</label>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        {isEn ? 'Phone / WhatsApp' : 'Teléfono / WhatsApp'}
+                      </label>
                       <input
                         required
                         type="tel"
@@ -188,7 +203,9 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">Ciudad en Venezuela</label>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        {isEn ? 'City in Venezuela' : 'Ciudad en Venezuela'}
+                      </label>
                       <input
                         required
                         type="text"
@@ -200,7 +217,9 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">Estado</label>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        {isEn ? 'State / Region' : 'Estado'}
+                      </label>
                       <input
                         required
                         type="text"
@@ -214,12 +233,14 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Dirección de Entrega o Concesionario Asociado</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      {isEn ? 'Delivery Address or Associated Dealership' : 'Dirección de Entrega o Concesionario Asociado'}
+                    </label>
                     <input
                       required
                       type="text"
                       name="direccionEntrega"
-                      placeholder="Av. Francisco de Miranda, Edif. Torre Centro"
+                      placeholder={isEn ? 'Main Ave, Torre Centro Bldg' : 'Av. Francisco de Miranda, Edif. Torre Centro'}
                       value={formData.direccionEntrega}
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2 text-xs bg-[#1a1c27] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white/20"
@@ -229,13 +250,13 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
 
                 <div className="pt-4 flex justify-between items-center border-t border-white/10">
                   <div className="text-xs text-slate-400">
-                    Monto estimado: <strong className="text-sm text-white font-black">${total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</strong>
+                    {isEn ? 'Estimated amount:' : 'Monto estimado:'} <strong className="text-sm text-white font-black">${total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</strong>
                   </div>
                   <button
                     type="submit"
                     className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white hover:bg-slate-200 text-slate-900 text-xs font-bold transition-all shadow-md"
                   >
-                    <span>Continuar al Método de Pago</span>
+                    <span>{isEn ? 'Continue to Payment Method' : 'Continuar al Método de Pago'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -248,23 +269,39 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                 <div className="flex items-center justify-between pb-2 border-b border-white/5">
                   <div className="flex items-center gap-2 text-sm font-bold text-slate-200">
                     <Lock className="w-4 h-4 text-emerald-400" />
-                    <span>Modalidad de Pago y Garantía de Importación</span>
+                    <span>{isEn ? 'Payment Method and Import Warranty' : 'Modalidad de Pago y Garantía de Importación'}</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setStep(1)}
                     className="text-xs text-slate-400 hover:text-white flex items-center gap-1"
                   >
-                    <ArrowLeft className="w-3 h-3" /> Volver
+                    <ArrowLeft className="w-3 h-3" /> {isEn ? 'Back' : 'Volver'}
                   </button>
                 </div>
 
                 <div className="space-y-2">
                   {[
-                    { id: 'binance', title: '💳 Binance Pay / USDT (Criptoactivo Seguro)', desc: 'Pago directo con código QR o Pay ID sin comisiones en USDT' },
-                    { id: 'paypal', title: '💳 PayPal / Tarjeta Internacional', desc: 'Pago seguro en USD con tarjeta de crédito/débito o balance PayPal' },
-                    { id: 'transferencia-internacional', title: 'Transferencia Bancaria Internacional / Cable USD', desc: 'Pago a cuenta de custodia en Dubái o EE.UU.' },
-                    { id: 'inicial-saldo', title: 'Plan Procura: 40% Anticipo + Saldo al Puerto', desc: '40% al iniciar embarque y 60% al arribo a Puerto Cabello' }
+                    {
+                      id: 'binance',
+                      title: isEn ? '💳 Binance Pay / USDT (Secure Crypto)' : '💳 Binance Pay / USDT (Criptoactivo Seguro)',
+                      desc: isEn ? 'Direct QR or Pay ID transfer with zero fees in USDT' : 'Pago directo con código QR o Pay ID sin comisiones en USDT'
+                    },
+                    {
+                      id: 'paypal',
+                      title: isEn ? '💳 PayPal / International Card' : '💳 PayPal / Tarjeta Internacional',
+                      desc: isEn ? 'Secure USD payment via credit/debit card or PayPal balance' : 'Pago seguro en USD con tarjeta de crédito/débito o balance PayPal'
+                    },
+                    {
+                      id: 'transferencia-internacional',
+                      title: isEn ? 'International Wire Transfer / USD Cable' : 'Transferencia Bancaria Internacional / Cable USD',
+                      desc: isEn ? 'Payment to international escrow account in Dubai or USA' : 'Pago a cuenta de custodia en Dubái o EE.UU.'
+                    },
+                    {
+                      id: 'inicial-saldo',
+                      title: isEn ? 'Procurement Plan: 40% Advance + Arrival Balance' : 'Plan Procura: 40% Anticipo + Saldo al Puerto',
+                      desc: isEn ? '40% at sailing inception and 60% upon arrival at Puerto Cabello' : '40% al iniciar embarque y 60% al arribo a Puerto Cabello'
+                    }
                   ].map((method) => (
                     <div
                       key={method.id}
@@ -291,10 +328,12 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                   <div className="p-4 rounded-2xl bg-[#0b0d14] border border-amber-500/30 space-y-3 shadow-inner">
                     <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
                       <QrCode className="w-4 h-4" />
-                      <span>Instrucciones de Pago con Binance Pay / USDT</span>
+                      <span>{isEn ? 'Payment Instructions with Binance Pay / USDT' : 'Instrucciones de Pago con Binance Pay / USDT'}</span>
                     </div>
                     <p className="text-[11px] text-slate-300">
-                      Para completar la reserva o el pago de tu vehículo, por favor sigue estas instrucciones:
+                      {isEn
+                        ? 'To complete your vehicle reservation or payment, please follow these instructions:'
+                        : 'Para completar la reserva o el pago de tu vehículo, por favor sigue estas instrucciones:'}
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 bg-[#131520] p-3 rounded-xl border border-white/10">
@@ -318,16 +357,46 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                             className="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold transition-all flex items-center gap-1"
                           >
                             {copiedId ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                            <span>{copiedId ? '¡Copiado!' : 'Copiar ID'}</span>
+                            <span>{copiedId ? (isEn ? 'Copied!' : '¡Copiado!') : (isEn ? 'Copy ID' : 'Copiar ID')}</span>
                           </button>
                         </div>
 
                         <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-300 leading-tight">
-                          <li>Abre tu aplicación de <strong>Binance</strong> en tu teléfono celular.</li>
-                          <li>Escanea el Código QR que aparece aquí o utiliza nuestro Pay ID: <strong className="text-amber-400 font-mono">395610250</strong>.</li>
-                          <li>Envía el monto exacto en <strong>USDT</strong>.</li>
-                          <li><strong className="text-amber-300">MUY IMPORTANTE:</strong> Al realizar la transferencia en Binance, incluye el número de referencia de tu pedido en el concepto o nota.</li>
-                          <li>Una vez hecho el pago, toma una captura de pantalla del comprobante y envíala a <strong className="text-white">corporationatlas969@gmail.com</strong> o a nuestro WhatsApp de soporte.</li>
+                          <li>
+                            {isEn ? (
+                              <>Open your <strong>Binance</strong> app on your mobile phone.</>
+                            ) : (
+                              <>Abre tu aplicación de <strong>Binance</strong> en tu teléfono celular.</>
+                            )}
+                          </li>
+                          <li>
+                            {isEn ? (
+                              <>Scan the QR code shown here or use our Pay ID: <strong className="text-amber-400 font-mono">395610250</strong>.</>
+                            ) : (
+                              <>Escanea el Código QR que aparece aquí o utiliza nuestro Pay ID: <strong className="text-amber-400 font-mono">395610250</strong>.</>
+                            )}
+                          </li>
+                          <li>
+                            {isEn ? (
+                              <>Send the exact amount in <strong>USDT</strong>.</>
+                            ) : (
+                              <>Envía el monto exacto en <strong>USDT</strong>.</>
+                            )}
+                          </li>
+                          <li>
+                            {isEn ? (
+                              <><strong className="text-amber-300">VERY IMPORTANT:</strong> When transferring on Binance, include your order reference number in the payment note/concept.</>
+                            ) : (
+                              <><strong className="text-amber-300">MUY IMPORTANTE:</strong> Al realizar la transferencia en Binance, incluye el número de referencia de tu pedido en el concepto o nota.</>
+                            )}
+                          </li>
+                          <li>
+                            {isEn ? (
+                              <>Once payment is sent, take a screenshot of the receipt and send it to <strong className="text-white">corporationatlas969@gmail.com</strong> or our WhatsApp support.</>
+                            ) : (
+                              <>Una vez hecho el pago, toma una captura de pantalla del comprobante y envíala a <strong className="text-white">corporationatlas969@gmail.com</strong> o a nuestro WhatsApp de soporte.</>
+                            )}
+                          </li>
                         </ol>
                       </div>
                     </div>
@@ -339,14 +408,18 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                   <div className="p-4 rounded-2xl bg-[#0b0d14] border border-blue-500/30 space-y-2.5 text-xs shadow-inner">
                     <div className="flex items-center gap-2 text-blue-400 font-bold">
                       <CreditCard className="w-4 h-4" />
-                      <span>Pago con PayPal / Tarjeta de Débito o Crédito</span>
+                      <span>{isEn ? 'Payment with PayPal / Credit or Debit Card' : 'Pago con PayPal / Tarjeta de Débito o Crédito'}</span>
                     </div>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
-                      Puedes realizar tu pago seguro mediante PayPal enviando a la cuenta corporativa oficial de Corporation Atlas.
+                      {isEn
+                        ? 'You can make your payment securely via PayPal to the official corporate account of Corporation Atlas.'
+                        : 'Puedes realizar tu pago seguro mediante PayPal enviando a la cuenta corporativa oficial de Corporation Atlas.'}
                     </p>
                     <div className="bg-[#131520] p-3 rounded-xl border border-white/10 flex items-center justify-between">
                       <div>
-                        <span className="text-[10px] text-slate-400 block font-mono">Cuenta PayPal Corporativa:</span>
+                        <span className="text-[10px] text-slate-400 block font-mono">
+                          {isEn ? 'Corporate PayPal Account:' : 'Cuenta PayPal Corporativa:'}
+                        </span>
                         <span className="font-mono font-bold text-white text-xs">corporationatlas969@gmail.com</span>
                       </div>
                       <button
@@ -359,7 +432,7 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                         className="px-2.5 py-1 rounded bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-[10px] font-bold transition-all flex items-center gap-1"
                       >
                         {copiedId ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                        <span>{copiedId ? '¡Copiado!' : 'Copiar Correo'}</span>
+                        <span>{copiedId ? (isEn ? 'Copied!' : '¡Copiado!') : (isEn ? 'Copy Email' : 'Copiar Correo')}</span>
                       </button>
                     </div>
                   </div>
@@ -369,10 +442,12 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                 <div className="bg-[#181a24] p-4 rounded-xl border border-white/10 text-xs space-y-1.5">
                   <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
                     <ShieldCheck className="w-4 h-4" />
-                    <span>Contrato de Procura con Garantía de Reembolso</span>
+                    <span>{isEn ? 'Procurement Contract with Full Refund Guarantee' : 'Contrato de Procura con Garantía de Reembolso'}</span>
                   </div>
                   <p className="text-[11px] text-slate-400">
-                    Una vez enviada la solicitud, un asesor de Atlas se comunicará al teléfono {formData.telefono || 'proporcionado'} para formalizar el contrato de consignación y flete marítimo.
+                    {isEn
+                      ? `Once submitted, an Atlas logistics advisor will contact phone ${formData.telefono || 'provided'} to finalize the consignment and maritime shipping contract.`
+                      : `Una vez enviada la solicitud, un asesor de Atlas se comunicará al teléfono ${formData.telefono || 'proporcionado'} para formalizar el contrato de consignación y flete marítimo.`}
                   </p>
                 </div>
 
@@ -388,10 +463,10 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                   {isProcessing ? (
                     <span className="flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                      Generando orden de procura y seguimiento...
+                      {isEn ? 'Generating procurement and tracking order...' : 'Generando orden de procura y seguimiento...'}
                     </span>
                   ) : (
-                    <span>Confirmar Solicitud de Procura</span>
+                    <span>{isEn ? 'Confirm Procurement Request' : 'Confirmar Solicitud de Procura'}</span>
                   )}
                 </button>
               </form>
@@ -405,34 +480,41 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-black text-white">¡Solicitud Registrada con Éxito!</h3>
+                  <h3 className="text-xl font-black text-white">
+                    {isEn ? 'Request Successfully Registered!' : '¡Solicitud Registrada con Éxito!'}
+                  </h3>
                   <p className="text-xs text-slate-400 mt-1">
-                    Hemos asignado un código de seguimiento prioritario y enviado los detalles a: <br />
-                    <strong className="text-white">{formData.email}</strong>
+                    {isEn ? (
+                      <>We have assigned a priority tracking code and sent details to: <br /><strong className="text-white">{formData.email}</strong></>
+                    ) : (
+                      <>Hemos asignado un código de seguimiento prioritario y enviado los detalles a: <br /><strong className="text-white">{formData.email}</strong></>
+                    )}
                   </p>
                 </div>
 
                 {/* Recibo de Procura */}
                 <div className="bg-[#181a24] p-4 rounded-2xl border border-white/10 text-left text-xs space-y-2 max-w-sm mx-auto">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Pedido & Referencia:</span>
+                    <span className="text-slate-400">{isEn ? 'Order & Reference:' : 'Pedido & Referencia:'}</span>
                     <span className="font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded">{trackingId}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Titular de Procura:</span>
+                    <span className="text-slate-400">{isEn ? 'Consignee Name:' : 'Titular de Procura:'}</span>
                     <span className="font-semibold text-white">{formData.nombre}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Método Elegido:</span>
+                    <span className="text-slate-400">{isEn ? 'Selected Method:' : 'Método Elegido:'}</span>
                     <span className="font-semibold text-amber-400 capitalize">{formData.metodoPago}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Destino de Entrega:</span>
+                    <span className="text-slate-400">{isEn ? 'Delivery Destination:' : 'Destino de Entrega:'}</span>
                     <span className="font-semibold text-white">{formData.ciudad}, Venezuela</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Estado de Procura:</span>
-                    <span className="font-bold text-emerald-400">En asignación de cupo</span>
+                    <span className="text-slate-400">{isEn ? 'Procurement Status:' : 'Estado de Procura:'}</span>
+                    <span className="font-bold text-emerald-400">
+                      {isEn ? 'Quota Assigned / In Process' : 'En asignación de cupo'}
+                    </span>
                   </div>
                 </div>
 
@@ -444,19 +526,27 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                     className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-xs transition-all shadow-xl flex items-center justify-center gap-2 active:scale-98"
                   >
                     <FileText className="w-4 h-4 text-black" />
-                    <span>Descargar / Imprimir Factura Proforma (PDF)</span>
+                    <span>{isEn ? 'Download / Print Proforma Invoice (PDF)' : 'Descargar / Imprimir Factura Proforma (PDF)'}</span>
                   </button>
                 </div>
 
                 {/* Acciones para enviar comprobante */}
                 <div className="p-4 rounded-2xl bg-[#11131e] border border-white/10 max-w-sm mx-auto space-y-2.5 text-xs">
                   <p className="text-slate-300 font-bold text-[11px]">
-                    Envía tu comprobante con el código de orden <strong className="text-white font-mono">{trackingId}</strong>:
+                    {isEn ? (
+                      <>Send your payment receipt with order code <strong className="text-white font-mono">{trackingId}</strong>:</>
+                    ) : (
+                      <>Envía tu comprobante con el código de orden <strong className="text-white font-mono">{trackingId}</strong>:</>
+                    )}
                   </p>
 
                   <div className="grid grid-cols-2 gap-2">
                     <a
-                      href={`https://wa.me/584222932455?text=${encodeURIComponent(`Hola Corporation Atlas, adjunto comprobante de pago para mi orden ${trackingId} a nombre de ${formData.nombre}.`)}`}
+                      href={`https://wa.me/584222932455?text=${encodeURIComponent(
+                        isEn
+                          ? `Hello Corporation Atlas, attaching payment receipt for my order ${trackingId} under name ${formData.nombre}.`
+                          : `Hola Corporation Atlas, adjunto comprobante de pago para mi orden ${trackingId} a nombre de ${formData.nombre}.`
+                      )}`}
                       target="_blank"
                       rel="noreferrer"
                       className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-1.5 shadow-md transition-all text-xs"
@@ -466,11 +556,19 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                     </a>
 
                     <a
-                      href={`mailto:corporationatlas969@gmail.com?subject=${encodeURIComponent(`Comprobante de Pago - Orden ${trackingId} (${formData.nombre})`)}&body=${encodeURIComponent(`Hola Corporation Atlas,\n\nAdjunto comprobante de pago para la orden ${trackingId}.\n\nTitular: ${formData.nombre}\nTeléfono: ${formData.telefono}\nMétodo: ${formData.metodoPago}`)}`}
+                      href={`mailto:corporationatlas969@gmail.com?subject=${encodeURIComponent(
+                        isEn
+                          ? `Payment Receipt - Order ${trackingId} (${formData.nombre})`
+                          : `Comprobante de Pago - Orden ${trackingId} (${formData.nombre})`
+                      )}&body=${encodeURIComponent(
+                        isEn
+                          ? `Hello Corporation Atlas,\n\nAttaching payment receipt for order ${trackingId}.\n\nName: ${formData.nombre}\nPhone: ${formData.telefono}\nMethod: ${formData.metodoPago}`
+                          : `Hola Corporation Atlas,\n\nAdjunto comprobante de pago para la orden ${trackingId}.\n\nTitular: ${formData.nombre}\nTeléfono: ${formData.telefono}\nMétodo: ${formData.metodoPago}`
+                      )}`}
                       className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold flex items-center justify-center gap-1.5 shadow-md transition-all text-xs"
                     >
                       <Mail className="w-4 h-4" />
-                      <span>Enviar Correo</span>
+                      <span>{isEn ? 'Send Email' : 'Enviar Correo'}</span>
                     </a>
                   </div>
                 </div>
@@ -480,7 +578,7 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
                     onClick={handleCloseAndReset}
                     className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-white text-slate-900 text-xs font-bold hover:bg-slate-200 transition-all shadow-md"
                   >
-                    <span>Volver al Catálogo Atlas</span>
+                    <span>{isEn ? 'Back to Atlas Catalog' : 'Volver al Catálogo Atlas'}</span>
                   </button>
                 </div>
               </div>

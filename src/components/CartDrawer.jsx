@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Trash2, ShoppingCart, ArrowRight, ShieldCheck, MapPin, Check, AlertCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const CartDrawer = ({ onCheckout }) => {
   const {
@@ -13,8 +14,11 @@ export const CartDrawer = ({ onCheckout }) => {
     discountAmount,
     total
   } = useCart();
+  const { language, t } = useLanguage();
 
   if (!isCartOpen) return null;
+
+  const totalUnits = cart.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -31,9 +35,11 @@ export const CartDrawer = ({ onCheckout }) => {
           <div className="p-5 border-b border-white/10 flex items-center justify-between bg-[#0e0f14]">
             <div className="flex items-center gap-2">
               <ShoppingCart className="w-5 h-5 text-white" />
-              <h2 className="text-base font-extrabold text-white tracking-wide">Solicitud de Procura</h2>
+              <h2 className="text-base font-extrabold text-white tracking-wide">
+                {language === 'es' ? 'Solicitud de Procura' : 'Procurement Order'}
+              </h2>
               <span className="px-2 py-0.5 text-xs font-bold bg-white/10 text-slate-200 rounded-full">
-                {cart.reduce((sum, i) => sum + i.quantity, 0)} {cart.reduce((sum, i) => sum + i.quantity, 0) === 1 ? 'unidad' : 'unidades'}
+                {totalUnits} {totalUnits === 1 ? (language === 'es' ? 'unidad' : 'unit') : (language === 'es' ? 'unidades' : 'units')}
               </span>
             </div>
             <button
@@ -48,7 +54,11 @@ export const CartDrawer = ({ onCheckout }) => {
           {/* Logistics Banner */}
           <div className="bg-[#1a1c27] px-5 py-3 border-b border-white/5 flex items-center gap-2 text-xs text-slate-300">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Tarifas CIF incluyen flete marítimo, seguro y gestión de aduana en Venezuela.</span>
+            <span>
+              {language === 'es'
+                ? 'Tarifas CIF incluyen flete marítimo, seguro y gestión de aduana en Venezuela.'
+                : 'CIF rates include ocean freight, insurance, and Venezuelan customs clearance.'}
+            </span>
           </div>
 
           {/* Cart Item List */}
@@ -58,15 +68,19 @@ export const CartDrawer = ({ onCheckout }) => {
                 <div className="w-16 h-16 rounded-full bg-white/5 text-slate-400 flex items-center justify-center">
                   <ShoppingCart className="w-8 h-8" />
                 </div>
-                <h3 className="text-base font-bold text-white">No tienes vehículos seleccionados</h3>
+                <h3 className="text-base font-bold text-white">
+                  {language === 'es' ? 'No tienes vehículos seleccionados' : 'Your cart is empty'}
+                </h3>
                 <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
-                  Explora nuestras líneas de procura y añade los modelos o motocicletas que deseas importar.
+                  {language === 'es'
+                    ? 'Explora nuestras líneas de procura y añade los modelos o motocicletas que deseas importar.'
+                    : 'Explore our procurement lines and add the models or motorcycles you wish to import.'}
                 </p>
                 <button
                   onClick={() => setIsCartOpen(false)}
                   className="px-6 py-2.5 rounded-xl bg-white text-slate-900 text-xs font-bold hover:bg-slate-200 transition-all shadow-md"
                 >
-                  Explorar Líneas de Procura
+                  {language === 'es' ? 'Explorar Líneas de Procura' : 'Browse Procurement Lines'}
                 </button>
               </div>
             ) : (
@@ -152,21 +166,23 @@ export const CartDrawer = ({ onCheckout }) => {
             <div className="p-5 border-t border-white/10 bg-[#0e0f14] space-y-4">
               <div className="space-y-1.5 text-xs text-slate-400">
                 <div className="flex justify-between">
-                  <span>Subtotal Unidades</span>
+                  <span>{language === 'es' ? 'Subtotal Unidades' : 'Units Subtotal'}</span>
                   <span className="font-semibold text-white">
                     ${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
                   </span>
                 </div>
                 <div className="flex justify-between text-emerald-400">
-                  <span>Seguro de Tránsito Internacional</span>
-                  <span className="font-semibold">Incluido</span>
+                  <span>{language === 'es' ? 'Seguro de Tránsito Internacional' : 'International Transit Insurance'}</span>
+                  <span className="font-semibold">{language === 'es' ? 'Incluido' : 'Included'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Nacionalización & PDI</span>
-                  <span className="font-semibold text-white">Incluido</span>
+                  <span>{language === 'es' ? 'Nacionalización & PDI' : 'Customs & PDI Inspection'}</span>
+                  <span className="font-semibold text-white">{language === 'es' ? 'Incluido' : 'Included'}</span>
                 </div>
                 <div className="pt-2 border-t border-white/10 flex justify-between items-baseline">
-                  <span className="text-sm font-bold text-white">Total Estimado Puesto en VEN</span>
+                  <span className="text-sm font-bold text-white">
+                    {language === 'es' ? 'Total Estimado Puesto en VEN' : 'Estimated Total Turnkey in VEN'}
+                  </span>
                   <span className="text-lg font-black text-white">
                     ${total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
                   </span>
@@ -180,7 +196,7 @@ export const CartDrawer = ({ onCheckout }) => {
                 }}
                 className="w-full py-3.5 px-4 rounded-xl bg-white hover:bg-slate-200 active:scale-98 text-slate-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all"
               >
-                <span>Solicitar Procura & Cotización Formal</span>
+                <span>{language === 'es' ? 'Solicitar Procura & Cotización Formal' : 'Proceed with Procurement & Formal Quote'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

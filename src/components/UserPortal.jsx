@@ -27,11 +27,14 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAdmin } from '../context/AdminContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ProformaInvoiceModal } from './ProformaInvoiceModal';
 
 export const UserPortal = () => {
   const { currentUser, setCurrentView, logout, updateUserProfile, setIsAuthModalOpen } = useAuth();
   const { ordersList } = useAdmin();
+  const { language, toggleLanguage, t } = useLanguage();
+  const isEn = language === 'en';
 
   // Tabs: 'orders' | 'tracking' | 'profile'
   const [activeTab, setActiveTab] = useState('orders');
@@ -58,9 +61,13 @@ export const UserPortal = () => {
           <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto border border-amber-500/20">
             <Lock className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-black text-white">Acceso Restringido</h2>
+          <h2 className="text-xl font-black text-white">
+            {isEn ? 'Restricted Access' : 'Acceso Restringido'}
+          </h2>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Debes estar registrado e iniciar sesión obligatoriamente para acceder a tu historial de pedidos y seguimiento satelital de vehículos.
+            {isEn
+              ? 'You must be registered and signed in to access your order history and live vehicle tracking.'
+              : 'Debes estar registrado e iniciar sesión obligatoriamente para acceder a tu historial de pedidos y seguimiento satelital de vehículos.'}
           </p>
           <div className="pt-3 flex flex-col gap-2.5">
             <button
@@ -70,13 +77,13 @@ export const UserPortal = () => {
               }}
               className="w-full py-3 rounded-xl bg-white text-black text-xs font-bold hover:bg-slate-200 transition-all shadow-md active:scale-98"
             >
-              Iniciar Sesión / Registrarse
+              {isEn ? 'Sign In / Register' : 'Iniciar Sesión / Registrarse'}
             </button>
             <button
               onClick={() => setCurrentView('store')}
               className="w-full py-2.5 rounded-xl bg-white/5 text-slate-400 text-xs font-semibold hover:bg-white/10 transition-all"
             >
-              Volver a la Tienda
+              {isEn ? 'Return to Store' : 'Volver a la Tienda'}
             </button>
           </div>
         </div>
@@ -96,17 +103,17 @@ export const UserPortal = () => {
 
   // Mapeo de etapas logísticas para la línea de tiempo
   const stages = [
-    { id: 1, label: 'Procura en Origen', desc: 'Dubái / China', icon: Package },
-    { id: 2, label: 'Tránsito Marítimo', desc: 'En navegación oceánica', icon: Ship },
-    { id: 3, label: 'Aduana & SENIAT', desc: 'Puerto Cabello / La Guaira', icon: FileCheck },
-    { id: 4, label: 'Listo para Rodar', desc: 'Inspeccionado con placas', icon: KeyRound }
+    { id: 1, label: isEn ? 'Origin Procurement' : 'Procura en Origen', desc: isEn ? 'Dubai / China' : 'Dubái / China', icon: Package },
+    { id: 2, label: isEn ? 'Ocean Transit' : 'Tránsito Marítimo', desc: isEn ? 'In ocean navigation' : 'En navegación oceánica', icon: Ship },
+    { id: 3, label: isEn ? 'Customs & SENIAT' : 'Aduana & SENIAT', desc: 'Puerto Cabello / La Guaira', icon: FileCheck },
+    { id: 4, label: isEn ? 'Ready to Drive' : 'Listo para Rodar', desc: isEn ? 'Inspected with license plates' : 'Inspeccionado con placas', icon: KeyRound }
   ];
 
   const getStageNumber = (status = '') => {
     const s = status.toLowerCase();
-    if (s.includes('entregado') || s.includes('listo')) return 4;
-    if (s.includes('aduana') || s.includes('puerto')) return 3;
-    if (s.includes('marítima') || s.includes('navegación') || s.includes('tránsito') || s.includes('embarque')) return 2;
+    if (s.includes('entregado') || s.includes('listo') || s.includes('ready') || s.includes('delivered')) return 4;
+    if (s.includes('aduana') || s.includes('puerto') || s.includes('customs')) return 3;
+    if (s.includes('marítima') || s.includes('navegación') || s.includes('tránsito') || s.includes('embarque') || s.includes('transit') || s.includes('ocean')) return 2;
     return 1;
   };
 
@@ -183,7 +190,7 @@ export const UserPortal = () => {
           <button
             onClick={() => setCurrentView('store')}
             className="p-2 sm:p-2.5 rounded-xl bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white transition-all border border-white/10 group"
-            title="Volver a la tienda principal"
+            title={isEn ? 'Back to main store' : 'Volver a la tienda principal'}
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
           </button>
@@ -200,19 +207,32 @@ export const UserPortal = () => {
           {/* Saludo Bienvenido al usuario */}
           <div>
             <h1 className="text-sm sm:text-base font-black tracking-wide text-white flex items-center gap-1.5">
-              <span>Bienvenido,</span>
+              <span>{isEn ? 'Welcome,' : 'Bienvenido,'}</span>
               <span className="text-slate-200 truncate max-w-[150px] sm:max-w-[260px]">
-                {currentUser?.name || 'Cliente'}
+                {currentUser?.name || (isEn ? 'Customer' : 'Cliente')}
               </span>
             </h1>
             <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">
-              Corporation Atlas • Procura y Logística Internacional
+              {isEn ? 'Corporation Atlas • International Procurement & Logistics' : 'Corporation Atlas • Procura y Logística Internacional'}
             </p>
           </div>
         </div>
 
-        {/* Lado derecho: Botón "Mi Perfil" con avatar (despliega los datos básicos) */}
-        <div className="flex items-center">
+        {/* Lado derecho: Botón selector de idioma y Mi Perfil */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Language Toggle Pill */}
+          <button
+            onClick={toggleLanguage}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 hover:text-white border border-white/15 text-xs font-bold transition-all active:scale-95 shadow-sm"
+            title={isEn ? 'Cambiar a Español' : 'Switch to English'}
+          >
+            <Globe className="w-3.5 h-3.5 text-blue-400" />
+            <span className={language === 'es' ? 'text-white font-extrabold' : 'text-slate-400'}>ES</span>
+            <span className="text-slate-500">|</span>
+            <span className={language === 'en' ? 'text-white font-extrabold' : 'text-slate-400'}>EN</span>
+          </button>
+
+          {/* Botón Mi Perfil */}
           <button
             onClick={() => setActiveTab('profile')}
             className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border transition-all ${
@@ -220,7 +240,7 @@ export const UserPortal = () => {
                 ? 'bg-white text-black border-white shadow-lg ring-2 ring-white/20'
                 : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300 hover:text-white'
             }`}
-            title="Ver y editar Mi Perfil"
+            title={isEn ? 'View and edit My Profile' : 'Ver y editar Mi Perfil'}
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow overflow-hidden border shrink-0 ${
               activeTab === 'profile' ? 'bg-black text-white border-black/20' : 'bg-white text-black border-white/20'
@@ -231,8 +251,8 @@ export const UserPortal = () => {
                 <span>{currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}</span>
               )}
             </div>
-            <span className="text-xs font-bold">
-              Mi Perfil
+            <span className="text-xs font-bold hidden sm:inline">
+              {isEn ? 'My Profile' : 'Mi Perfil'}
             </span>
           </button>
         </div>
@@ -251,7 +271,7 @@ export const UserPortal = () => {
             }`}
           >
             <Package className="w-4 h-4" />
-            <span>Mis Pedidos</span>
+            <span>{isEn ? 'My Orders' : 'Mis Pedidos'}</span>
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${activeTab === 'orders' ? 'bg-black text-white' : 'bg-white/10 text-slate-300'}`}>
               {myOrders.length}
             </span>
@@ -267,7 +287,7 @@ export const UserPortal = () => {
             }`}
           >
             <Navigation className="w-4 h-4" />
-            <span>Seguimiento de Vehículo</span>
+            <span>{isEn ? 'Vehicle Tracking' : 'Seguimiento de Vehículo'}</span>
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
           </button>
         </div>
@@ -281,9 +301,13 @@ export const UserPortal = () => {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Historial de Mis Pedidos</h2>
+                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                  {isEn ? 'My Orders History' : 'Historial de Mis Pedidos'}
+                </h2>
                 <p className="text-xs text-slate-400 mt-1">
-                  Consulta el estatus de las unidades adquiridas e ingresa al mapa satelital de seguimiento.
+                  {isEn
+                    ? 'Check the status of your acquired units and access the satellite tracking map.'
+                    : 'Consulta el estatus de las unidades adquiridas e ingresa al mapa satelital de seguimiento.'}
                 </p>
               </div>
 
@@ -293,7 +317,7 @@ export const UserPortal = () => {
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-500/20 self-start sm:self-auto transition-all"
                 >
                   <Navigation className="w-4 h-4" />
-                  <span>Ver Mapa Satelital Global</span>
+                  <span>{isEn ? 'View Global Satellite Map' : 'Ver Mapa Satelital Global'}</span>
                 </button>
               )}
             </div>
@@ -303,16 +327,20 @@ export const UserPortal = () => {
                 <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-slate-400">
                   <Package className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-bold text-white">No tienes pedidos activos aún</h3>
+                <h3 className="text-lg font-bold text-white">
+                  {isEn ? 'You have no active orders yet' : 'No tienes pedidos activos aún'}
+                </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Explora nuestro catálogo de motocicletas y vehículos en la vitrina principal para tramitar tu orden de procura e importación con entrega directa en Venezuela.
+                  {isEn
+                    ? 'Explore our vehicle and motorcycle catalog in the main store to process your direct procurement order with turnkey delivery in Venezuela.'
+                    : 'Explora nuestro catálogo de motocicletas y vehículos en la vitrina principal para tramitar tu orden de procura e importación con entrega directa en Venezuela.'}
                 </p>
                 <button
                   onClick={() => setCurrentView('store')}
                   className="px-6 py-3 rounded-xl bg-white text-black text-xs font-bold hover:bg-slate-200 transition-all shadow-md inline-flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Ir al menú principal</span>
+                  <span>{isEn ? 'Back to Main Store' : 'Ir al menú principal'}</span>
                 </button>
               </div>
             ) : (
@@ -329,22 +357,24 @@ export const UserPortal = () => {
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/10 gap-3">
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs font-bold text-slate-400">Código de Orden:</span>
+                            <span className="text-xs font-bold text-slate-400">
+                              {isEn ? 'Order Code:' : 'Código de Orden:'}
+                            </span>
                             <span className="font-mono text-sm font-black text-white bg-white/10 px-2.5 py-0.5 rounded-lg border border-white/10">
                               {order.id}
                             </span>
                             <span className="text-[11px] text-slate-400">
-                              • Solicitado el {order.date}
+                              • {isEn ? `Ordered on ${order.date}` : `Solicitado el ${order.date}`}
                             </span>
                           </div>
                           <p className="text-xs text-slate-300 mt-1.5">
-                            Destino de entrega: <strong className="text-white">{order.ciudad || 'Caracas / Valencia'}, Venezuela</strong>
+                            {isEn ? 'Delivery destination:' : 'Destino de entrega:'} <strong className="text-white">{order.ciudad || 'Caracas / Valencia'}, Venezuela</strong>
                           </p>
                         </div>
 
                         <div className="flex items-center gap-2">
                           <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                            {order.status || 'En trámite de embarque'}
+                            {order.status || (isEn ? 'In shipping process' : 'En trámite de embarque')}
                           </span>
                         </div>
                       </div>
@@ -352,7 +382,7 @@ export const UserPortal = () => {
                       {/* Línea de tiempo de 4 etapas */}
                       <div className="py-1">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-3">
-                          Etapa de la Operación
+                          {isEn ? 'Operation Stage' : 'Etapa de la Operación'}
                         </span>
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
@@ -400,17 +430,19 @@ export const UserPortal = () => {
                       <div className="bg-[#171926] p-4 rounded-xl border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
                           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                            Unidad Solicitada
+                            {isEn ? 'Requested Unit' : 'Unidad Solicitada'}
                           </span>
                           <h4 className="text-base font-black text-white mt-0.5">{order.vehiculo}</h4>
                           <span className="text-xs text-slate-400">
-                            Modalidad: <strong className="text-slate-300">{order.metodoPago || 'Plan Procura'}</strong>
+                            {isEn ? 'Modality:' : 'Modalidad:'} <strong className="text-slate-300">{order.metodoPago || 'Plan Procura'}</strong>
                           </span>
                         </div>
 
                         <div className="flex items-center gap-3 flex-wrap justify-end">
                           <div className="text-left md:text-right mr-2">
-                            <span className="text-[10px] text-slate-400 block uppercase font-bold">Monto Puesto en VE:</span>
+                            <span className="text-[10px] text-slate-400 block uppercase font-bold">
+                              {isEn ? 'Turnkey Amount in VE:' : 'Monto Puesto en VE:'}
+                            </span>
                             <span className="text-lg font-black text-white">
                               ${order.total ? order.total.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'} USD
                             </span>
@@ -423,10 +455,10 @@ export const UserPortal = () => {
                               setIsInvoiceOpen(true);
                             }}
                             className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10 shadow-sm"
-                            title="Ver e Imprimir Factura Proforma en PDF"
+                            title={isEn ? 'View & Print Proforma Invoice in PDF' : 'Ver e Imprimir Factura Proforma en PDF'}
                           >
                             <FileText className="w-3.5 h-3.5 text-amber-400" />
-                            <span>Factura Proforma</span>
+                            <span>{isEn ? 'Proforma Invoice' : 'Factura Proforma'}</span>
                           </button>
 
                           {/* Botón destacado: Abrir Mapa de Seguimiento */}
@@ -435,18 +467,22 @@ export const UserPortal = () => {
                             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white text-black hover:bg-slate-200 text-xs font-bold transition-all shadow-md"
                           >
                             <Navigation className="w-3.5 h-3.5" />
-                            <span>Rastrear en Mapa</span>
+                            <span>{isEn ? 'Track on Map' : 'Rastrear en Mapa'}</span>
                           </button>
 
                           {/* Botón WhatsApp */}
                           <a
-                            href={`https://wa.me/584222932455?text=${encodeURIComponent(`Hola Atlas, soy ${currentUser?.name || order.nombre} y deseo consultar el estatus de mi orden ${order.id}.`)}`}
+                            href={`https://wa.me/584222932455?text=${encodeURIComponent(
+                              isEn
+                                ? `Hello Atlas, I am ${currentUser?.name || order.nombre} and I want to check the status of my order ${order.id}.`
+                                : `Hola Atlas, soy ${currentUser?.name || order.nombre} y deseo consultar el estatus de mi orden ${order.id}.`
+                            )}`}
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-all"
                           >
                             <MessageCircle className="w-4 h-4" />
-                            <span className="hidden sm:inline">Consultar Asesor</span>
+                            <span className="hidden sm:inline">{isEn ? 'Contact Advisor' : 'Consultar Asesor'}</span>
                           </a>
                         </div>
                       </div>
@@ -465,20 +501,24 @@ export const UserPortal = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Rastreo Satelital en Tiempo Real</h2>
+                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                    {isEn ? 'Real-Time Satellite Tracking' : 'Rastreo Satelital en Tiempo Real'}
+                  </h2>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                    <Radio className="w-3 h-3 animate-pulse text-emerald-400" /> GPS Activo
+                    <Radio className="w-3 h-3 animate-pulse text-emerald-400" /> {isEn ? 'GPS Active' : 'GPS Activo'}
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
-                  Posición satelital del buque mercante y trayecto marítimo internacional con destino a puertos de Venezuela.
+                  {isEn
+                    ? 'Satellite position of the merchant vessel and international maritime route destined for Venezuelan ports.'
+                    : 'Posición satelital del buque mercante y trayecto marítimo internacional con destino a puertos de Venezuela.'}
                 </p>
               </div>
 
               {/* Selector de orden si tiene varias */}
               {myOrders.length > 1 && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-400 font-bold">Orden:</span>
+                  <span className="text-xs text-slate-400 font-bold">{isEn ? 'Order:' : 'Orden:'}</span>
                   <select
                     value={selectedTrackingOrder?.id}
                     onChange={(e) => {
@@ -505,13 +545,15 @@ export const UserPortal = () => {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 text-slate-300">
                     <Compass className="w-4 h-4 text-blue-400 animate-spin" style={{ animationDuration: '15s' }} />
-                    <span className="font-mono font-bold text-white">Ruta: Dubái / China ➔ Puerto Cabello, Venezuela</span>
+                    <span className="font-mono font-bold text-white">
+                      {isEn ? 'Route: Dubai / China ➔ Puerto Cabello, Venezuela' : 'Ruta: Dubái / China ➔ Puerto Cabello, Venezuela'}
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
                   <span>Coord: <strong className="text-emerald-400">12° 28' 14" N, 68° 01' 22" W</strong></span>
-                  <span className="hidden sm:inline">Buque: <strong className="text-slate-200">Atlas Ocean Voyager IV</strong></span>
+                  <span className="hidden sm:inline">{isEn ? 'Vessel:' : 'Buque:'} <strong className="text-slate-200">Atlas Ocean Voyager IV</strong></span>
                 </div>
               </div>
 
@@ -604,9 +646,9 @@ export const UserPortal = () => {
                 <div className="absolute top-[34%] right-[14%] sm:right-[16%] flex flex-col items-center pointer-events-none">
                   <div className="bg-[#10121d]/90 backdrop-blur-xs border border-blue-500/40 px-2.5 py-1 rounded-lg text-[10px] font-bold text-blue-300 shadow-lg whitespace-nowrap flex items-center gap-1">
                     <Anchor className="w-3 h-3 text-blue-400" />
-                    <span>Puerto Jebel Ali (Dubái)</span>
+                    <span>{isEn ? 'Port of Jebel Ali (Dubai)' : 'Puerto Jebel Ali (Dubái)'}</span>
                   </div>
-                  <span className="text-[9px] text-slate-400 font-mono mt-0.5">Zarpe confirmado</span>
+                  <span className="text-[9px] text-slate-400 font-mono mt-0.5">{isEn ? 'Departure confirmed' : 'Zarpe confirmado'}</span>
                 </div>
 
                 {/* Pin Posición en Vivo del Buque */}
@@ -614,16 +656,16 @@ export const UserPortal = () => {
                   <div className="relative group cursor-pointer">
                     <div className="bg-emerald-950/90 backdrop-blur-md border border-emerald-400 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-300 shadow-xl shadow-emerald-500/20 whitespace-nowrap flex items-center gap-2 animate-bounce" style={{ animationDuration: '3s' }}>
                       <Ship className="w-4 h-4 text-emerald-400" />
-                      <span>Buque en Navegación</span>
+                      <span>{isEn ? 'Vessel in Transit' : 'Buque en Navegación'}</span>
                       <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                     </div>
 
                     {/* Popover con detalles en hover */}
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-3 rounded-xl bg-[#11131e] border border-white/20 shadow-2xl text-[10px] space-y-1 opacity-90 group-hover:opacity-100 transition-opacity pointer-events-none">
                       <p className="font-bold text-white text-xs">Atlas Ocean Voyager IV</p>
-                      <p className="text-slate-300">Rumbo: 272° O (Mar Caribe)</p>
-                      <p className="text-emerald-400 font-mono">Velocidad: 18.4 nudos (34 km/h)</p>
-                      <p className="text-slate-400">Arribo estimado: 4 Días 16 Horas</p>
+                      <p className="text-slate-300">{isEn ? 'Heading: 272° W (Caribbean Sea)' : 'Rumbo: 272° O (Mar Caribe)'}</p>
+                      <p className="text-emerald-400 font-mono">{isEn ? 'Speed: 18.4 knots (34 km/h)' : 'Velocidad: 18.4 nudos (34 km/h)'}</p>
+                      <p className="text-slate-400">{isEn ? 'Estimated Arrival: 4 Days 16 Hours' : 'Arribo estimado: 4 Días 16 Horas'}</p>
                     </div>
                   </div>
                 </div>
@@ -634,7 +676,7 @@ export const UserPortal = () => {
                     <MapPin className="w-3 h-3 text-red-400" />
                     <span>Puerto Cabello, VE</span>
                   </div>
-                  <span className="text-[9px] text-slate-400 font-mono mt-0.5">Destino Final</span>
+                  <span className="text-[9px] text-slate-400 font-mono mt-0.5">{isEn ? 'Final Destination' : 'Destino Final'}</span>
                 </div>
 
                 {/* Overlay de Telemetría Inferior del Mapa */}
@@ -645,7 +687,7 @@ export const UserPortal = () => {
                     </div>
                     <div>
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        Cargamento Asociado
+                        {isEn ? 'Associated Cargo' : 'Cargamento Asociado'}
                       </span>
                       <strong className="text-white text-sm">
                         {selectedTrackingOrder?.vehiculo || 'Atlas Apex 250 Sport R'}
@@ -655,19 +697,19 @@ export const UserPortal = () => {
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-left font-mono text-[11px]">
                     <div>
-                      <span className="text-slate-500 text-[9px] block uppercase font-sans font-bold">Estado</span>
-                      <span className="text-emerald-400 font-bold">En Tránsito Marítimo</span>
+                      <span className="text-slate-500 text-[9px] block uppercase font-sans font-bold">{isEn ? 'Status' : 'Estado'}</span>
+                      <span className="text-emerald-400 font-bold">{isEn ? 'In Maritime Transit' : 'En Tránsito Marítimo'}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500 text-[9px] block uppercase font-sans font-bold">Velocidad</span>
-                      <span className="text-white">18.4 Nudos</span>
+                      <span className="text-slate-500 text-[9px] block uppercase font-sans font-bold">{isEn ? 'Speed' : 'Velocidad'}</span>
+                      <span className="text-white">{isEn ? '18.4 Knots' : '18.4 Nudos'}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500 text-[9px] block uppercase font-sans font-bold">Tiempo Estimado</span>
-                      <span className="text-amber-300 font-bold">ETA: 4 Días</span>
+                      <span className="text-slate-500 text-[9px] block uppercase font-sans font-bold">{isEn ? 'Estimated Time' : 'Tiempo Estimado'}</span>
+                      <span className="text-amber-300 font-bold">{isEn ? 'ETA: 4 Days' : 'ETA: 4 Días'}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500 text-[9px] block uppercase font-sans font-bold">BL Embarque</span>
+                      <span className="text-slate-500 text-[9px] block uppercase font-sans font-bold">{isEn ? 'Shipping BL' : 'BL Embarque'}</span>
                       <span className="text-slate-300">MSCU-889102</span>
                     </div>
                   </div>
@@ -679,7 +721,7 @@ export const UserPortal = () => {
               <div className="p-6 bg-[#0e1018] border-t border-white/10 space-y-4">
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                   <Clock className="w-4 h-4 text-slate-400" />
-                  <span>Bitácora de Posicionamiento Satelital</span>
+                  <span>{isEn ? 'Satellite Positioning Logbook' : 'Bitácora de Posicionamiento Satelital'}</span>
                 </h3>
 
                 <div className="space-y-3 text-xs">
@@ -687,11 +729,15 @@ export const UserPortal = () => {
                     <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <strong className="text-white font-bold">Ingreso al Mar Caribe - Aguas Internacionales</strong>
-                        <span className="text-[10px] font-mono text-slate-400">Hoy, 09:30 AM</span>
+                        <strong className="text-white font-bold">
+                          {isEn ? 'Entry into Caribbean Sea - International Waters' : 'Ingreso al Mar Caribe - Aguas Internacionales'}
+                        </strong>
+                        <span className="text-[10px] font-mono text-slate-400">{isEn ? 'Today, 09:30 AM' : 'Hoy, 09:30 AM'}</span>
                       </div>
                       <p className="text-slate-400 mt-0.5 text-[11px]">
-                        Navegación estable rumbo a las costas centrales venezolanas. Condiciones marítimas óptimas.
+                        {isEn
+                          ? 'Stable navigation heading to central Venezuelan coasts. Optimal maritime conditions.'
+                          : 'Navegación estable rumbo a las costas centrales venezolanas. Condiciones marítimas óptimas.'}
                       </p>
                     </div>
                   </div>
@@ -700,11 +746,15 @@ export const UserPortal = () => {
                     <div className="w-2 h-2 rounded-full bg-blue-400 mt-1.5 shrink-0" />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <strong className="text-slate-200 font-bold">Cruce Transatlántico Completado</strong>
-                        <span className="text-[10px] font-mono text-slate-400">Hace 3 días</span>
+                        <strong className="text-slate-200 font-bold">
+                          {isEn ? 'Transatlantic Crossing Completed' : 'Cruce Transatlántico Completado'}
+                        </strong>
+                        <span className="text-[10px] font-mono text-slate-400">{isEn ? '3 days ago' : 'Hace 3 días'}</span>
                       </div>
                       <p className="text-slate-400 mt-0.5 text-[11px]">
-                        Embarcación finalizó el paso por el Océano Atlántico Central manteniendo velocidad de crucero.
+                        {isEn
+                          ? 'Vessel concluded transit through Central Atlantic Ocean maintaining cruising speed.'
+                          : 'Embarcación finalizó el paso por el Océano Atlántico Central manteniendo velocidad de crucero.'}
                       </p>
                     </div>
                   </div>
@@ -713,11 +763,15 @@ export const UserPortal = () => {
                     <div className="w-2 h-2 rounded-full bg-slate-500 mt-1.5 shrink-0" />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <strong className="text-slate-300 font-bold">Zarpe y Embarque en Puerto Jebel Ali, Dubái</strong>
-                        <span className="text-[10px] font-mono text-slate-400">Hace 14 días</span>
+                        <strong className="text-slate-300 font-bold">
+                          {isEn ? 'Departure & Boarding at Port of Jebel Ali, Dubai' : 'Zarpe y Embarque en Puerto Jebel Ali, Dubái'}
+                        </strong>
+                        <span className="text-[10px] font-mono text-slate-400">{isEn ? '14 days ago' : 'Hace 14 días'}</span>
                       </div>
                       <p className="text-slate-400 mt-0.5 text-[11px]">
-                        Contenedor de seguridad precintado e inspeccionado antes de estiba.
+                        {isEn
+                          ? 'Security container sealed and inspected prior to stowage.'
+                          : 'Contenedor de seguridad precintado e inspeccionado antes de estiba.'}
                       </p>
                     </div>
                   </div>
@@ -733,9 +787,13 @@ export const UserPortal = () => {
           <div className="max-w-2xl space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Mi Perfil & Datos Básicos</h2>
+                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                  {isEn ? 'My Profile & Account Details' : 'Mi Perfil & Datos Básicos'}
+                </h2>
                 <p className="text-xs text-slate-400 mt-1">
-                  Actualiza tu fotografía de perfil y datos personales para los trámites de importación, aduana y entrega.
+                  {isEn
+                    ? 'Update your profile picture and personal data for import processing, customs clearance, and delivery.'
+                    : 'Actualiza tu fotografía de perfil y datos personales para los trámites de importación, aduana y entrega.'}
                 </p>
               </div>
               <button
@@ -743,7 +801,7 @@ export const UserPortal = () => {
                 className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10 flex items-center gap-1.5 self-start sm:self-auto"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Volver a Mis Pedidos</span>
+                <span>{isEn ? 'Back to My Orders' : 'Volver a Mis Pedidos'}</span>
               </button>
             </div>
 
@@ -764,7 +822,7 @@ export const UserPortal = () => {
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     className="absolute bottom-0 right-0 p-2 rounded-full bg-white text-black hover:bg-slate-200 shadow-lg border border-black/10 transition-transform active:scale-95"
-                    title="Subir o cambiar foto"
+                    title={isEn ? 'Upload or change picture' : 'Subir o cambiar foto'}
                   >
                     <Camera className="w-4 h-4" />
                   </button>
@@ -779,9 +837,11 @@ export const UserPortal = () => {
                 </div>
 
                 <div className="text-center sm:text-left space-y-2 flex-1">
-                  <h3 className="text-sm font-bold text-white">Fotografía de Perfil</h3>
+                  <h3 className="text-sm font-bold text-white">{isEn ? 'Profile Picture' : 'Fotografía de Perfil'}</h3>
                   <p className="text-xs text-slate-400">
-                    Esta imagen se reflejará en tu encabezado, barra lateral y ficha de cliente. Formato recomendado: JPG o PNG.
+                    {isEn
+                      ? 'This picture will be reflected in your header, sidebar, and customer profile. Recommended format: JPG or PNG.'
+                      : 'Esta imagen se reflejará en tu encabezado, barra lateral y ficha de cliente. Formato recomendado: JPG o PNG.'}
                   </p>
                   
                   <div className="flex items-center gap-2 justify-center sm:justify-start pt-1">
@@ -790,7 +850,7 @@ export const UserPortal = () => {
                       onClick={() => fileInputRef.current?.click()}
                       className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10"
                     >
-                      Subir Nueva Foto
+                      {isEn ? 'Upload New Photo' : 'Subir Nueva Foto'}
                     </button>
 
                     {currentUser?.photoURL && (
@@ -800,7 +860,7 @@ export const UserPortal = () => {
                         className="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold transition-all border border-red-500/20 inline-flex items-center gap-1"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        <span>Eliminar</span>
+                        <span>{isEn ? 'Delete' : 'Eliminar'}</span>
                       </button>
                     )}
                   </div>
@@ -810,20 +870,24 @@ export const UserPortal = () => {
               {/* FORMULARIO DE DATOS */}
               <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
                 <div>
-                  <label className="block font-bold text-slate-300 mb-1.5">Nombre Completo</label>
+                  <label className="block font-bold text-slate-300 mb-1.5">
+                    {isEn ? 'Full Name' : 'Nombre Completo'}
+                  </label>
                   <input
                     type="text"
                     required
                     value={profileForm.name}
                     onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                    placeholder="Ej. Oscar Ramirez"
+                    placeholder={isEn ? 'e.g. Oscar Ramirez' : 'Ej. Oscar Ramirez'}
                     className="w-full px-4 py-2.5 bg-[#171926] border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/20 text-xs"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1.5">Cédula de Identidad / RIF</label>
+                    <label className="block font-bold text-slate-300 mb-1.5">
+                      {isEn ? 'ID Card / Tax ID' : 'Cédula de Identidad / RIF'}
+                    </label>
                     <input
                       type="text"
                       value={profileForm.cedula}
@@ -833,7 +897,9 @@ export const UserPortal = () => {
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1.5">Teléfono / WhatsApp</label>
+                    <label className="block font-bold text-slate-300 mb-1.5">
+                      {isEn ? 'Phone / WhatsApp' : 'Teléfono / WhatsApp'}
+                    </label>
                     <input
                       type="tel"
                       value={profileForm.phone}
@@ -845,7 +911,9 @@ export const UserPortal = () => {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-300 mb-1.5">Correo Electrónico (Registrado)</label>
+                  <label className="block font-bold text-slate-300 mb-1.5">
+                    {isEn ? 'Email Address (Registered)' : 'Correo Electrónico (Registrado)'}
+                  </label>
                   <input
                     type="email"
                     disabled
@@ -853,28 +921,34 @@ export const UserPortal = () => {
                     className="w-full px-4 py-2.5 bg-[#0f1017] border border-white/5 rounded-xl text-slate-400 cursor-not-allowed text-xs font-mono"
                   />
                   <span className="text-[10px] text-slate-500 mt-1 block">
-                    Cuenta verificada y vinculada a la base de datos de Corporation Atlas.
+                    {isEn
+                      ? 'Verified account linked to the Corporation Atlas database.'
+                      : 'Cuenta verificada y vinculada a la base de datos de Corporation Atlas.'}
                   </span>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-300 mb-1.5">Ciudad de Destino en Venezuela</label>
+                  <label className="block font-bold text-slate-300 mb-1.5">
+                    {isEn ? 'Destination City in Venezuela' : 'Ciudad de Destino en Venezuela'}
+                  </label>
                   <input
                     type="text"
                     value={profileForm.city}
                     onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
-                    placeholder="Valencia, Caracas, Barquisimeto..."
+                    placeholder={isEn ? 'Valencia, Caracas, Barquisimeto...' : 'Valencia, Caracas, Barquisimeto...'}
                     className="w-full px-4 py-2.5 bg-[#171926] border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/20 text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-300 mb-1.5">Dirección de Entrega Personal o Concesionario</label>
+                  <label className="block font-bold text-slate-300 mb-1.5">
+                    {isEn ? 'Personal or Dealership Delivery Address' : 'Dirección de Entrega Personal o Concesionario'}
+                  </label>
                   <input
                     type="text"
                     value={profileForm.address}
                     onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
-                    placeholder="Av., Urbanización, Edificio o Punto de Referencia"
+                    placeholder={isEn ? 'Avenue, Neighborhood, Building or Landmark' : 'Av., Urbanización, Edificio o Punto de Referencia'}
                     className="w-full px-4 py-2.5 bg-[#171926] border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/20 text-xs"
                   />
                 </div>
@@ -882,7 +956,7 @@ export const UserPortal = () => {
                 <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   {profileSaved ? (
                     <span className="text-emerald-400 font-bold flex items-center gap-1.5 text-xs bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
-                      <CheckCircle2 className="w-4 h-4" /> Datos sincronizados en la nube exitosamente
+                      <CheckCircle2 className="w-4 h-4" /> {isEn ? 'Data successfully synchronized in the cloud' : 'Datos sincronizados en la nube exitosamente'}
                     </span>
                   ) : <div />}
 
@@ -890,7 +964,7 @@ export const UserPortal = () => {
                     type="submit"
                     className="px-6 py-2.5 rounded-xl bg-white hover:bg-slate-200 text-black font-bold shadow-lg transition-all text-xs"
                   >
-                    Guardar Cambios
+                    {isEn ? 'Save Changes' : 'Guardar Cambios'}
                   </button>
                 </div>
               </form>

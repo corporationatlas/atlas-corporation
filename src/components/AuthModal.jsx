@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Lock, Mail, User, Phone, MapPin, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const AuthModal = () => {
   const {
@@ -11,6 +12,8 @@ export const AuthModal = () => {
     authError,
     authLoading
   } = useAuth();
+  const { t, language } = useLanguage();
+  const isEn = language === 'en';
 
   const [mode, setMode] = useState('login'); // 'login' | 'register'
   const [loginData, setLoginData] = useState({ email: '', password: '' });
@@ -50,7 +53,7 @@ export const AuthModal = () => {
           <button
             onClick={() => setIsAuthModalOpen(false)}
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white transition-colors"
-            aria-label="Cerrar ventana"
+            aria-label={t('common.close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -77,7 +80,7 @@ export const AuthModal = () => {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              Iniciar Sesión
+              {t('auth.signIn')}
             </button>
             <button
               onClick={() => setMode('register')}
@@ -87,7 +90,7 @@ export const AuthModal = () => {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              Crear Cuenta
+              {t('auth.signUp')}
             </button>
           </div>
 
@@ -105,12 +108,12 @@ export const AuthModal = () => {
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Correo Electrónico</span>
+                    <span>{t('auth.emailLabel')}</span>
                   </label>
                   <input
                     type="email"
                     required
-                    placeholder="ej. usuario@atlas.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={loginData.email}
                     onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-[#1a1c27] border border-white/15 rounded-xl text-white placeholder-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-white/30"
@@ -120,7 +123,7 @@ export const AuthModal = () => {
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Contraseña</span>
+                    <span>{t('auth.passwordLabel')}</span>
                   </label>
                   <input
                     type="password"
@@ -142,10 +145,10 @@ export const AuthModal = () => {
                   }`}
                 >
                   {authLoading ? (
-                    <span>Verificando credenciales...</span>
+                    <span>{t('auth.verifying')}</span>
                   ) : (
                     <>
-                      <span>Ingresar a ATLAS</span>
+                      <span>{t('auth.signInBtn')}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </>
                   )}
@@ -158,11 +161,11 @@ export const AuthModal = () => {
           {mode === 'register' && (
             <form onSubmit={handleRegisterSubmit} className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Nombre y Apellido</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">{t('auth.nameLabel')}</label>
                 <input
                   type="text"
                   required
-                  placeholder="ej. Carlos Mendoza"
+                  placeholder={t('auth.namePlaceholder')}
                   value={registerData.name}
                   onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
                   className="w-full px-3.5 py-2 bg-[#1a1c27] border border-white/15 rounded-xl text-white text-xs focus:outline-none focus:ring-2 focus:ring-white/30"
@@ -171,7 +174,7 @@ export const AuthModal = () => {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Cédula / RIF</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{t('auth.cedulaLabel')}</label>
                   <input
                     type="text"
                     required
@@ -182,7 +185,7 @@ export const AuthModal = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Ciudad en Venezuela</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{t('auth.cityLabel')}</label>
                   <input
                     type="text"
                     required
@@ -195,7 +198,7 @@ export const AuthModal = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Teléfono / WhatsApp</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">{t('auth.phoneLabel')}</label>
                 <input
                   type="tel"
                   required
@@ -207,7 +210,7 @@ export const AuthModal = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Correo Electrónico</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">{t('auth.emailLabel')}</label>
                 <input
                   type="email"
                   required
@@ -219,11 +222,11 @@ export const AuthModal = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Crear Contraseña</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">{t('auth.passwordLabel')}</label>
                 <input
                   type="password"
                   required
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder={isEn ? 'At least 6 characters' : 'Mínimo 6 caracteres'}
                   value={registerData.password}
                   onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                   className="w-full px-3.5 py-2 bg-[#1a1c27] border border-white/15 rounded-xl text-white text-xs focus:outline-none"
@@ -234,7 +237,7 @@ export const AuthModal = () => {
                 type="submit"
                 className="w-full py-3 rounded-xl bg-white hover:bg-slate-200 text-slate-900 font-bold text-xs transition-all shadow-md mt-2 flex items-center justify-center gap-1.5"
               >
-                <span>Registrarse y entrar a ATLAS</span>
+                <span>{t('auth.signUpBtn')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </form>

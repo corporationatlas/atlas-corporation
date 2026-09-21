@@ -1,8 +1,9 @@
 import React from 'react';
-import { ShoppingCart, Search, User, ShieldAlert, LogOut, Package, ArrowRight, X } from 'lucide-react';
+import { ShoppingCart, Search, User, ShieldAlert, LogOut, Package, ArrowRight, X, Globe } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAdmin } from '../context/AdminContext';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const Sidebar = ({
   searchQuery,
@@ -16,12 +17,13 @@ export const Sidebar = ({
   const { cartCount, setIsCartOpen } = useCart();
   const { companyInfo } = useAdmin();
   const { currentUser, setCurrentView, setIsAuthModalOpen, logout } = useAuth();
+  const { language, toggleLanguage, t } = useLanguage();
 
   const navLinks = [
-    { id: 'inicio', label: 'Inicio' },
-    { id: 'tienda', label: 'Tienda' },
-    { id: 'servicios', label: 'Servicios' },
-    { id: 'sobre-nosotros', label: 'Sobre nosotros' }
+    { id: 'inicio', label: t('nav.home') },
+    { id: 'tienda', label: t('nav.store') },
+    { id: 'servicios', label: t('nav.services') },
+    { id: 'sobre-nosotros', label: t('nav.about') }
   ];
 
   const handleNavClick = (id) => {
@@ -68,8 +70,20 @@ export const Sidebar = ({
               </div>
             </div>
 
-            {/* Cart Icon */}
-            <div className="flex items-center gap-2 pt-1">
+            {/* Cart & Language Selector Header Controls */}
+            <div className="flex items-center gap-1.5 pt-1">
+              {/* Language Switcher Button */}
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-[#141720]/80 hover:bg-[#1e2330] text-white text-[11px] font-bold transition-all border border-white/15 hover:border-white/30 shadow-md group active:scale-95"
+                title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+              >
+                <Globe className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-colors" />
+                <span className={language === 'es' ? 'text-white font-black' : 'text-slate-500 font-semibold'}>ES</span>
+                <span className="text-slate-600 text-[10px]">/</span>
+                <span className={language === 'en' ? 'text-white font-black' : 'text-slate-500 font-semibold'}>EN</span>
+              </button>
+
               <button
                 onClick={() => setIsCartOpen(true)}
                 className="relative w-10 h-10 rounded-xl bg-[#141720]/80 hover:bg-[#1e2330] text-white flex items-center justify-center transition-all border border-white/15 hover:border-white/30 shadow-md group"
@@ -97,7 +111,7 @@ export const Sidebar = ({
           <div className="relative">
             <input
               type="text"
-              placeholder="Search..."
+              placeholder={t('common.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-[#dce1e8] hover:bg-[#eaeef3] focus:bg-white text-slate-900 placeholder:text-slate-500 text-sm font-medium rounded-full pl-4 pr-10 py-2.5 outline-none transition-all shadow-inner border border-white/20 focus:ring-2 focus:ring-slate-400/40"
@@ -145,7 +159,7 @@ export const Sidebar = ({
                       {currentUser.name}
                     </span>
                     <span className="text-[10px] text-slate-400 block capitalize">
-                      {currentUser.role === 'admin' ? 'Administrador' : 'Cliente'}
+                      {currentUser.role === 'admin' ? t('nav.adminRole') : t('nav.clientRole')}
                     </span>
                   </div>
                 </div>
@@ -153,7 +167,7 @@ export const Sidebar = ({
                 <button
                   onClick={logout}
                   className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                  title="Cerrar sesión"
+                  title={t('nav.logOut')}
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
@@ -167,12 +181,12 @@ export const Sidebar = ({
                 {currentUser.role === 'admin' ? (
                   <>
                     <ShieldAlert className="w-3.5 h-3.5 text-slate-900" />
-                    <span>Gestionar Tienda</span>
+                    <span>{t('nav.manageStore')}</span>
                   </>
                 ) : (
                   <>
                     <Package className="w-3.5 h-3.5 text-slate-900" />
-                    <span>Mis Pedidos</span>
+                    <span>{t('nav.myOrders')}</span>
                   </>
                 )}
               </button>
@@ -184,7 +198,7 @@ export const Sidebar = ({
                 onClick={() => setIsAuthModalOpen(true)}
                 className="w-full py-3 px-4 rounded-2xl bg-[#141722]/85 hover:bg-[#1c202d] text-white text-xs font-bold transition-all flex items-center justify-between border border-white/20 hover:border-white/35 group shadow-lg shadow-black/30 backdrop-blur-xs active:scale-98"
               >
-                <span className="text-slate-100 font-bold tracking-wide">Rastrear mi Vehículo</span>
+                <span className="text-slate-100 font-bold tracking-wide">{t('nav.trackVehicle')}</span>
                 <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
               </button>
             </div>

@@ -14,8 +14,12 @@ import {
   Phone,
   Receipt
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
+  const { language, t } = useLanguage();
+  const isEn = language === 'en';
+
   // 'notice' = Aviso de Pedido / Presupuesto (Foto 2 estilo Odoo)
   // 'invoice' = Factura Formal Comercial Definitiva
   const [docType, setDocType] = useState('notice');
@@ -201,7 +205,7 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
               }`}
             >
               <Receipt className="w-3.5 h-3.5" />
-              <span>Aviso de Pedido (Estilo Odoo)</span>
+              <span>{isEn ? 'Order Notice (Odoo Style)' : 'Aviso de Pedido (Estilo Odoo)'}</span>
             </button>
 
             <button
@@ -213,7 +217,7 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
               }`}
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>Factura Formal Comercial</span>
+              <span>{isEn ? 'Formal Commercial Invoice' : 'Factura Formal Comercial'}</span>
             </button>
           </div>
 
@@ -221,16 +225,16 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
             <button
               onClick={handlePrint}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-black hover:bg-slate-200 text-xs font-bold transition-all shadow-md active:scale-95"
-              title="Imprimir o Guardar en PDF limpio"
+              title={isEn ? 'Print or Save clean PDF' : 'Imprimir o Guardar en PDF limpio'}
             >
               <Printer className="w-4 h-4" />
-              <span>Imprimir / Guardar PDF</span>
+              <span>{isEn ? 'Print / Save PDF' : 'Imprimir / Guardar PDF'}</span>
             </button>
 
             <button
               onClick={onClose}
               className="p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
-              title="Cerrar"
+              title={isEn ? 'Close' : 'Cerrar'}
             >
               <X className="w-5 h-5" />
             </button>
@@ -249,7 +253,7 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
               {/* Encabezado Odoo */}
               <div className="space-y-1">
                 <span className="text-xs text-slate-600 font-medium block">
-                  Su Presupuesto
+                  {isEn ? 'Your Quote' : 'Su Presupuesto'}
                 </span>
                 <h1 className="text-3xl font-black text-blue-600 underline tracking-tight">
                   {orderRef}
@@ -262,23 +266,35 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
               {/* Cuerpo del Mensaje Odoo */}
               <div className="space-y-4 text-[13px] sm:text-sm text-slate-800">
                 <p className="font-semibold">
-                  Hola {order.nombre || 'Cliente'}:
+                  {isEn ? `Hello ${order.nombre || 'Customer'}:` : `Hola ${order.nombre || 'Cliente'}:`}
                 </p>
 
                 <p>
-                  El pago con referencia <strong className="font-bold text-black">{orderRef}</strong> por un importe de{' '}
-                  <strong className="font-black text-black">${formattedTotal} USD</strong> en relación con su pedido{' '}
-                  <strong className="font-bold text-black">{orderRef}</strong> ({order.vehiculo || 'Vehículo bajo demanda'}) está pendiente de pago.
+                  {isEn ? (
+                    <>
+                      The payment with reference <strong className="font-bold text-black">{orderRef}</strong> for an amount of{' '}
+                      <strong className="font-black text-black">${formattedTotal} USD</strong> regarding your order{' '}
+                      <strong className="font-bold text-black">{orderRef}</strong> ({order.vehiculo || 'Custom on-demand vehicle'}) is pending payment.
+                    </>
+                  ) : (
+                    <>
+                      El pago con referencia <strong className="font-bold text-black">{orderRef}</strong> por un importe de{' '}
+                      <strong className="font-black text-black">${formattedTotal} USD</strong> en relación con su pedido{' '}
+                      <strong className="font-bold text-black">{orderRef}</strong> ({order.vehiculo || 'Vehículo bajo demanda'}) está pendiente de pago.
+                    </>
+                  )}
                 </p>
 
                 <p>
-                  Confirmaremos su pedido una vez que se haya confirmado el pago.
+                  {isEn
+                    ? 'We will confirm your order as soon as payment is confirmed.'
+                    : 'Confirmaremos su pedido una vez que se haya confirmado el pago.'}
                 </p>
 
                 {/* Recuadro del Medio de Pago Seleccionado por el Cliente */}
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3 my-4">
                   <span className="text-xs font-bold text-slate-900 block uppercase tracking-wider">
-                    Canal de Pago para Liquidar su Pedido:
+                    {isEn ? 'Payment Channel to Settle Your Order:' : 'Canal de Pago para Liquidar su Pedido:'}
                   </span>
 
                   {/* Binance Pay / USDT */}
@@ -290,17 +306,21 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
                           <span className="text-sm">Binance Pay / USDT</span>
                         </div>
                         <span className="text-[10px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded">
-                          Criptoactivo Seguro
+                          {isEn ? 'Secure Crypto' : 'Criptoactivo Seguro'}
                         </span>
                       </div>
                       <p className="text-slate-700">
-                        Pay ID Oficial: <strong className="text-black font-mono text-sm">395610250</strong>
+                        {isEn ? 'Official Pay ID:' : 'Pay ID Oficial:'} <strong className="text-black font-mono text-sm">395610250</strong>
                       </p>
                       <p className="text-slate-600">
-                        Concepto / Nota obligatoria: <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
+                        {isEn ? 'Required Concept / Note:' : 'Concepto / Nota obligatoria:'} <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
                       </p>
                       <p className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-100 leading-relaxed">
-                        Abre Binance en tu teléfono celular, ingresa en Pay con el ID <strong>395610250</strong> y envía el monto en USDT colocando el código <strong>{orderRef}</strong> en la nota del pago.
+                        {isEn ? (
+                          <>Open Binance on your phone, go to Pay with ID <strong>395610250</strong> and transfer the USDT amount including code <strong>{orderRef}</strong> in the payment note.</>
+                        ) : (
+                          <>Abre Binance en tu teléfono celular, ingresa en Pay con el ID <strong>395610250</strong> y envía el monto en USDT colocando el código <strong>{orderRef}</strong> en la nota del pago.</>
+                        )}
                       </p>
                     </div>
                   )}
@@ -311,20 +331,24 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
                       <div className="font-bold text-slate-900 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <CreditCard className="w-4 h-4 text-blue-600" />
-                          <span className="text-sm">PayPal (USD / Tarjeta Internacional)</span>
+                          <span className="text-sm">{isEn ? 'PayPal (USD / International Card)' : 'PayPal (USD / Tarjeta Internacional)'}</span>
                         </div>
                         <span className="text-[10px] font-bold bg-blue-100 text-blue-900 px-2 py-0.5 rounded">
-                          Pago Seguro USD
+                          {isEn ? 'Secure USD Payment' : 'Pago Seguro USD'}
                         </span>
                       </div>
                       <p className="text-slate-700">
-                        Cuenta Corporativa: <strong className="text-black font-mono text-xs sm:text-sm">corporationatlas969@gmail.com</strong>
+                        {isEn ? 'Corporate Account:' : 'Cuenta Corporativa:'} <strong className="text-black font-mono text-xs sm:text-sm">corporationatlas969@gmail.com</strong>
                       </p>
                       <p className="text-slate-600">
-                        Nota de la transacción: <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
+                        {isEn ? 'Transaction Note:' : 'Nota de la transacción:'} <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
                       </p>
                       <p className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-100 leading-relaxed">
-                        Al enviar tu pago por PayPal, recuerda incluir el código <strong>{orderRef}</strong> en la nota o concepto para conciliar tu compra inmediatamente.
+                        {isEn ? (
+                          <>When sending your payment via PayPal, remember to include code <strong>{orderRef}</strong> in the note/concept to reconcile immediately.</>
+                        ) : (
+                          <>Al enviar tu pago por PayPal, recuerda incluir el código <strong>{orderRef}</strong> en la nota o concepto para conciliar tu compra inmediatamente.</>
+                        )}
                       </p>
                     </div>
                   )}
@@ -335,20 +359,24 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
                       <div className="font-bold text-slate-900 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <Building2 className="w-4 h-4 text-emerald-600" />
-                          <span className="text-sm">Transferencia Bancaria Internacional / Cable USD</span>
+                          <span className="text-sm">{isEn ? 'International Wire Transfer / USD Cable' : 'Transferencia Bancaria Internacional / Cable USD'}</span>
                         </div>
                         <span className="text-[10px] font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">
-                          Cuenta Custodia
+                          {isEn ? 'Escrow Account' : 'Cuenta Custodia'}
                         </span>
                       </div>
                       <p className="text-slate-700">
-                        Beneficiario: <strong className="text-black font-semibold">Corporation Atlas C.A.</strong>
+                        {isEn ? 'Beneficiary:' : 'Beneficiario:'} <strong className="text-black font-semibold">Corporation Atlas C.A.</strong>
                       </p>
                       <p className="text-slate-600">
-                        Referencia obligatoria: <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
+                        {isEn ? 'Required Reference:' : 'Referencia obligatoria:'} <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
                       </p>
                       <p className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-100 leading-relaxed">
-                        Comunícate a nuestro WhatsApp corporativo indicando tu referencia <strong>{orderRef}</strong> para suministrarte los datos SWIFT/IBAN de liquidación.
+                        {isEn ? (
+                          <>Contact our corporate WhatsApp indicating your reference <strong>{orderRef}</strong> to receive SWIFT/IBAN wire details.</>
+                        ) : (
+                          <>Comunícate a nuestro WhatsApp corporativo indicando tu referencia <strong>{orderRef}</strong> para suministrarte los datos SWIFT/IBAN de liquidación.</>
+                        )}
                       </p>
                     </div>
                   )}
@@ -359,38 +387,42 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
                       <div className="font-bold text-slate-900 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <Receipt className="w-4 h-4 text-purple-600" />
-                          <span className="text-sm">Plan Procura: 40% Anticipo + Saldo al Puerto</span>
+                          <span className="text-sm">{isEn ? 'Procurement Plan: 40% Advance + Balance on Arrival' : 'Plan Procura: 40% Anticipo + Saldo al Puerto'}</span>
                         </div>
                         <span className="text-[10px] font-bold bg-purple-100 text-purple-900 px-2 py-0.5 rounded">
-                          Modalidad Fraccionada
+                          {isEn ? 'Split Plan' : 'Modalidad Fraccionada'}
                         </span>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
                         <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                          <span className="text-[10px] text-slate-500 block font-semibold">40% Anticipo de Zarpe:</span>
+                          <span className="text-[10px] text-slate-500 block font-semibold">{isEn ? '40% Departure Advance:' : '40% Anticipo de Zarpe:'}</span>
                           <strong className="text-black font-mono text-sm font-bold">${advanceAmount} USD</strong>
                         </div>
                         <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                          <span className="text-[10px] text-slate-500 block font-semibold">60% Saldo al Arribo en VE:</span>
+                          <span className="text-[10px] text-slate-500 block font-semibold">{isEn ? '60% Balance on VE Arrival:' : '60% Saldo al Arribo en VE:'}</span>
                           <strong className="text-black font-mono text-sm font-bold">${balanceAmount} USD</strong>
                         </div>
                       </div>
                       <p className="text-slate-600 pt-1">
-                        Referencia del Pedido: <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
+                        {isEn ? 'Order Reference:' : 'Referencia del Pedido:'} <strong className="text-black font-mono text-sm font-bold">{orderRef}</strong>
                       </p>
                       <p className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-100 leading-relaxed">
-                        Puedes liquidar el 40% de anticipo (${advanceAmount} USD) vía Binance Pay ID (395610250) o PayPal (corporationatlas969@gmail.com) indicando la referencia <strong>{orderRef}</strong>.
+                        {isEn ? (
+                          <>You can settle the 40% advance (${advanceAmount} USD) via Binance Pay ID (395610250) or PayPal (corporationatlas969@gmail.com) stating reference <strong>{orderRef}</strong>.</>
+                        ) : (
+                          <>Puedes liquidar el 40% de anticipo (${advanceAmount} USD) vía Binance Pay ID (395610250) o PayPal (corporationatlas969@gmail.com) indicando la referencia <strong>{orderRef}</strong>.</>
+                        )}
                       </p>
                     </div>
                   )}
                 </div>
 
                 <p>
-                  Agradecemos su confianza.
+                  {isEn ? 'We appreciate your trust.' : 'Agradecemos su confianza.'}
                 </p>
 
                 <p>
-                  No dude en ponerse en contacto con nosotros si tiene alguna pregunta.
+                  {isEn ? 'Do not hesitate to contact us if you have any questions.' : 'No dude en ponerse en contacto con nosotros si tiene alguna pregunta.'}
                 </p>
 
                 <div className="pt-2 text-slate-600">
@@ -425,22 +457,22 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
                       CORPORATION ATLAS C.A.
                     </h2>
                     <p className="text-[10px] text-slate-600">
-                      R.I.F. J-50493821-0 • Registro Mercantil de Comercio Exterior y Procura Automotriz<br />
-                      Caracas / Valencia • Puertos de Desaduanamiento: Puerto Cabello & La Guaira
+                      R.I.F. J-50493821-0 • {isEn ? 'Mercantile Registry of Foreign Trade & Automotive Procurement' : 'Registro Mercantil de Comercio Exterior y Procura Automotriz'}<br />
+                      Caracas / Valencia • {isEn ? 'Ports of Customs Clearance: Puerto Cabello & La Guaira' : 'Puertos de Desaduanamiento: Puerto Cabello & La Guaira'}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right border border-slate-300 p-3 rounded-lg bg-slate-50 min-w-[170px]">
                   <span className="text-[10px] font-black uppercase text-slate-700 block tracking-widest">
-                    FACTURA COMERCIAL
+                    {isEn ? 'COMMERCIAL INVOICE' : 'FACTURA COMERCIAL'}
                   </span>
                   <span className="text-sm font-black font-mono text-black block">
                     {order.id || orderRef}
                   </span>
                   <div className="text-[10px] text-slate-600 mt-1 space-y-0.5">
-                    <p>Fecha: <strong>{orderDate}</strong></p>
-                    <p>Estado: <strong className="text-emerald-700 uppercase">Orden Registrada</strong></p>
+                    <p>{isEn ? 'Date:' : 'Fecha:'} <strong>{orderDate}</strong></p>
+                    <p>{isEn ? 'Status:' : 'Estado:'} <strong className="text-emerald-700 uppercase">{isEn ? 'Registered Order' : 'Orden Registrada'}</strong></p>
                   </div>
                 </div>
               </div>
@@ -449,21 +481,21 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
               <div className="grid grid-cols-2 gap-4 p-3.5 rounded-lg bg-slate-50 border border-slate-200">
                 <div>
                   <span className="text-[10px] font-black uppercase text-slate-500 block mb-1">
-                    CLIENTE CONSIGNATARIO
+                    {isEn ? 'CONSIGNEE CUSTOMER' : 'CLIENTE CONSIGNATARIO'}
                   </span>
                   <p className="font-bold text-xs text-black">{order.nombre}</p>
-                  <p className="text-slate-700">Cédula / RIF: <span className="font-mono">{order.cedula || 'V-En proceso'}</span></p>
-                  <p className="text-slate-700">Teléfono: {order.telefono || 'Sin registrar'}</p>
+                  <p className="text-slate-700">{isEn ? 'ID / Tax ID:' : 'Cédula / RIF:'} <span className="font-mono">{order.cedula || (isEn ? 'In process' : 'V-En proceso')}</span></p>
+                  <p className="text-slate-700">{isEn ? 'Phone:' : 'Teléfono:'} {order.telefono || (isEn ? 'Not registered' : 'Sin registrar')}</p>
                   <p className="text-slate-700">Email: {order.email}</p>
                 </div>
 
                 <div>
                   <span className="text-[10px] font-black uppercase text-slate-500 block mb-1">
-                    DESTINO DE NACIONALIZACIÓN
+                    {isEn ? 'CUSTOMS DESTINATION' : 'DESTINO DE NACIONALIZACIÓN'}
                   </span>
                   <p className="font-bold text-xs text-black">{order.ciudad || 'Caracas / Valencia'}, Venezuela</p>
-                  <p className="text-slate-700">Dirección: {order.direccionEntrega || 'Entrega en Concesionario'}</p>
-                  <p className="text-slate-700">Modalidad: <strong>{order.metodoPago || 'Plan Procura'}</strong></p>
+                  <p className="text-slate-700">{isEn ? 'Address:' : 'Dirección:'} {order.direccionEntrega || (isEn ? 'Dealership Handover' : 'Entrega en Concesionario')}</p>
+                  <p className="text-slate-700">{isEn ? 'Modality:' : 'Modalidad:'} <strong>{order.metodoPago || 'Plan Procura'}</strong></p>
                 </div>
               </div>
 
@@ -471,22 +503,24 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
               <table className="w-full text-left text-xs border border-slate-300">
                 <thead className="bg-slate-100 border-b border-slate-300 text-slate-800">
                   <tr>
-                    <th className="p-2.5">Descripción de la Unidad Automotriz</th>
-                    <th className="p-2.5">Puerto / Ruta</th>
-                    <th className="p-2.5 text-center">Cant.</th>
-                    <th className="p-2.5 text-right">Precio Unitario</th>
-                    <th className="p-2.5 text-right">Total USD</th>
+                    <th className="p-2.5">{isEn ? 'Automotive Unit Description' : 'Descripción de la Unidad Automotriz'}</th>
+                    <th className="p-2.5">{isEn ? 'Port / Route' : 'Puerto / Ruta'}</th>
+                    <th className="p-2.5 text-center">{isEn ? 'Qty.' : 'Cant.'}</th>
+                    <th className="p-2.5 text-right">{isEn ? 'Unit Price' : 'Precio Unitario'}</th>
+                    <th className="p-2.5 text-right">{isEn ? 'Total USD' : 'Total USD'}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   <tr>
                     <td className="p-2.5 font-bold text-black">
-                      {order.vehiculo || 'Unidad Automotriz Atlas Spec'}
+                      {order.vehiculo || (isEn ? 'Atlas Spec Automotive Unit' : 'Unidad Automotriz Atlas Spec')}
                       <span className="block text-[10px] text-slate-600 font-normal mt-0.5">
-                        Incluye: Flete marítimo internacional en contenedor sellado, aranceles aduanales SENIAT, certificado de origen y gestión de placas INTT en Venezuela.
+                        {isEn
+                          ? 'Includes: International ocean freight in sealed container, SENIAT customs duties, certificate of origin, and INTT license plates in Venezuela.'
+                          : 'Incluye: Flete marítimo internacional en contenedor sellado, aranceles aduanales SENIAT, certificado de origen y gestión de placas INTT en Venezuela.'}
                       </span>
                     </td>
-                    <td className="p-2.5 text-slate-700">Dubái / China ➔ Venezuela</td>
+                    <td className="p-2.5 text-slate-700">{isEn ? 'Dubai / China ➔ Venezuela' : 'Dubái / China ➔ Venezuela'}</td>
                     <td className="p-2.5 text-center font-mono">1</td>
                     <td className="p-2.5 text-right font-mono">${formattedTotal}</td>
                     <td className="p-2.5 text-right font-mono font-bold text-black">${formattedTotal}</td>
@@ -497,11 +531,21 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
               {/* Liquidación de Totales */}
               <div className="flex justify-between items-start gap-4 pt-1">
                 <div className="space-y-1.5 flex-1 text-[11px] text-slate-600">
-                  <p className="font-bold text-slate-800">Garantía y Condiciones de Comercio Exterior:</p>
+                  <p className="font-bold text-slate-800">{isEn ? 'Foreign Trade Terms & Warranty:' : 'Garantía y Condiciones de Comercio Exterior:'}</p>
                   <p>
-                    • Cobertura de seguro marítimo contra todo riesgo hasta el puerto de arribo en Venezuela.<br />
-                    • Trámite formal de aduanas ante SENIAT con factura de nacionalización legal.<br />
-                    • Garantía de fábrica respaldada por Corporation Atlas.
+                    {isEn ? (
+                      <>
+                        • Full marine all-risk insurance coverage up to the arrival port in Venezuela.<br />
+                        • Formal customs clearance with official SENIAT nationalization invoice.<br />
+                        • Factory warranty backed by Corporation Atlas.
+                      </>
+                    ) : (
+                      <>
+                        • Cobertura de seguro marítimo contra todo riesgo hasta el puerto de arribo en Venezuela.<br />
+                        • Trámite formal de aduanas ante SENIAT con factura de nacionalización legal.<br />
+                        • Garantía de fábrica respaldada por Corporation Atlas.
+                      </>
+                    )}
                   </p>
                 </div>
 
@@ -511,15 +555,15 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
                     <span className="font-mono">${(totalAmount * 0.85).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
-                    <span>Flete Marítimo:</span>
+                    <span>{isEn ? 'Ocean Freight:' : 'Flete Marítimo:'}</span>
                     <span className="font-mono">${(totalAmount * 0.10).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
-                    <span>Aranceles SENIAT:</span>
+                    <span>{isEn ? 'SENIAT Duties:' : 'Aranceles SENIAT:'}</span>
                     <span className="font-mono">${(totalAmount * 0.05).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div className="pt-1.5 border-t border-slate-300 flex justify-between font-bold text-black text-sm">
-                    <span>Total Puesto en VE:</span>
+                    <span>{isEn ? 'Total Delivered in VE:' : 'Total Puesto en VE:'}</span>
                     <span className="font-mono">${formattedTotal} USD</span>
                   </div>
                 </div>
@@ -533,8 +577,8 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
                 </div>
                 <div className="text-right">
                   <div className="w-36 border-b border-slate-400 mb-1"></div>
-                  <p className="font-bold text-black">Firma y Sello Autorizado</p>
-                  <p>Departamento de Importación & Logística</p>
+                  <p className="font-bold text-black">{isEn ? 'Authorized Seal & Signature' : 'Firma y Sello Autorizado'}</p>
+                  <p>{isEn ? 'Import & Logistics Department' : 'Departamento de Importación & Logística'}</p>
                 </div>
               </div>
 
@@ -551,13 +595,17 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
         {/* ================= BARRA INFERIOR DE ACCIONES (NO IMPRIMIBLE) ================= */}
         <div className="p-4 sm:px-6 bg-[#131522] border-t border-white/10 flex flex-wrap items-center justify-between gap-3 no-print">
           <a
-            href={`https://wa.me/584222932455?text=${encodeURIComponent(`Hola Corporation Atlas, adjunto comprobante del pedido ${orderRef} (${order.nombre}) por un importe de $${formattedTotal} USD.`)}`}
+            href={`https://wa.me/584222932455?text=${encodeURIComponent(
+              isEn
+                ? `Hello Corporation Atlas, attaching payment receipt for order ${orderRef} (${order.nombre}) for the amount of $${formattedTotal} USD.`
+                : `Hola Corporation Atlas, adjunto comprobante del pedido ${orderRef} (${order.nombre}) por un importe de $${formattedTotal} USD.`
+            )}`}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow"
           >
             <MessageCircle className="w-4 h-4" />
-            <span>Notificar Pago por WhatsApp</span>
+            <span>{isEn ? 'Notify Payment via WhatsApp' : 'Notificar Pago por WhatsApp'}</span>
           </a>
 
           <div className="flex items-center gap-2">
@@ -566,14 +614,14 @@ export const ProformaInvoiceModal = ({ isOpen, onClose, order }) => {
               className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-white text-black hover:bg-slate-200 text-xs font-bold transition-all shadow"
             >
               <Printer className="w-4 h-4" />
-              <span>Imprimir / PDF</span>
+              <span>{isEn ? 'Print / PDF' : 'Imprimir / PDF'}</span>
             </button>
 
             <button
               onClick={onClose}
               className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 text-xs font-bold"
             >
-              Cerrar
+              {isEn ? 'Close' : 'Cerrar'}
             </button>
           </div>
         </div>

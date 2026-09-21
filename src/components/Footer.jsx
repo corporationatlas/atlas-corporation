@@ -1,7 +1,11 @@
 import React from 'react';
 import { MapPin, Phone, Mail, ShieldCheck } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const Footer = ({ onSelectLine }) => {
+  const { language, t } = useLanguage();
+  const isEn = language === 'en';
+
   return (
     <footer className="bg-gradient-to-b from-[#090b10] via-[#12151e] to-[#202430] text-slate-400 text-xs border-t border-white/10 py-14 px-6 sm:px-10 lg:px-14">
       <div className="max-w-7xl mx-auto">
@@ -16,24 +20,28 @@ export const Footer = ({ onSelectLine }) => {
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Importación bajo demanda de vehículos y motocicletas a nivel internacional con entrega llave en mano en Venezuela.
+              {isEn
+                ? 'On-demand international vehicle and motorcycle procurement with turnkey delivery in Venezuela.'
+                : 'Importación bajo demanda de vehículos y motocicletas a nivel internacional con entrega llave en mano en Venezuela.'}
             </p>
             <div className="flex items-center gap-1.5 text-slate-300 text-[11px] pt-1">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Operaciones 100% legales y transparentes</span>
+              <span>{isEn ? '100% legal and transparent operations' : 'Operaciones 100% legales y transparentes'}</span>
             </div>
           </div>
 
           {/* Líneas de Procura */}
           <div>
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">Líneas de Procura</h4>
+            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
+              {isEn ? 'Procurement Lines' : 'Líneas de Procura'}
+            </h4>
             <ul className="space-y-2">
               <li>
                 <button
                   onClick={() => onSelectLine('motos-efficiency')}
                   className="hover:text-white transition-colors"
                 >
-                  Motos: Efficiency Line
+                  {t('lines.lineTitles.motos-efficiency')}
                 </button>
               </li>
               <li>
@@ -41,7 +49,7 @@ export const Footer = ({ onSelectLine }) => {
                   onClick={() => onSelectLine('motos-power')}
                   className="hover:text-white transition-colors"
                 >
-                  Motos: Power Line
+                  {t('lines.lineTitles.motos-power')}
                 </button>
               </li>
               <li>
@@ -49,7 +57,7 @@ export const Footer = ({ onSelectLine }) => {
                   onClick={() => onSelectLine('motos-smart')}
                   className="hover:text-white transition-colors"
                 >
-                  Motos: Smart Line
+                  {t('lines.lineTitles.motos-smart')}
                 </button>
               </li>
               <li>
@@ -57,7 +65,7 @@ export const Footer = ({ onSelectLine }) => {
                   onClick={() => onSelectLine('suv')}
                   className="hover:text-white transition-colors"
                 >
-                  Camionetas SUV
+                  {t('lines.lineTitles.suv')}
                 </button>
               </li>
               <li>
@@ -65,7 +73,7 @@ export const Footer = ({ onSelectLine }) => {
                   onClick={() => onSelectLine('pick-up')}
                   className="hover:text-white transition-colors"
                 >
-                  Camionetas Pick-up
+                  {t('lines.lineTitles.pick-up')}
                 </button>
               </li>
             </ul>
@@ -73,7 +81,9 @@ export const Footer = ({ onSelectLine }) => {
 
           {/* Puertos */}
           <div>
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">Puertos</h4>
+            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
+              {isEn ? 'Ports' : 'Puertos'}
+            </h4>
             <ul className="space-y-2 text-slate-400">
               <li className="flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -81,18 +91,20 @@ export const Footer = ({ onSelectLine }) => {
               </li>
               <li className="flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-amber-400/80 shrink-0" />
-                <span>Puerto de Puerto Cabello <span className="text-[11px] text-amber-400 font-medium">(Próximamente)</span></span>
+                <span>Puerto de Puerto Cabello <span className="text-[11px] text-amber-400 font-medium">{isEn ? '(Coming Soon)' : '(Próximamente)'}</span></span>
               </li>
               <li className="flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-amber-400/80 shrink-0" />
-                <span>Puerto El Guamache (Isla de Margarita, Nueva Esparta) <span className="text-[11px] text-amber-400 font-medium">(Próximamente)</span></span>
+                <span>Puerto El Guamache (Isla de Margarita, Nueva Esparta) <span className="text-[11px] text-amber-400 font-medium">{isEn ? '(Coming Soon)' : '(Próximamente)'}</span></span>
               </li>
             </ul>
           </div>
 
           {/* Atención y Soporte */}
           <div>
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">Atención y Soporte</h4>
+            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
+              {isEn ? 'Customer Care & Support' : 'Atención y Soporte'}
+            </h4>
             <ul className="space-y-2 text-slate-400">
               <li className="flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5 text-slate-400" />
@@ -113,8 +125,8 @@ export const Footer = ({ onSelectLine }) => {
 
         {/* Bottom */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
-          <p>© 2026 Corporation Atlas. Todos los derechos reservados.</p>
-          <p>Plataforma Digital de Procura Automotriz e Importación para Venezuela.</p>
+          <p>© 2026 Corporation Atlas. {t('footer.rights')}</p>
+          <p>{isEn ? 'Digital Automotive Procurement & Import Platform for Venezuela.' : 'Plataforma Digital de Procura Automotriz e Importación para Venezuela.'}</p>
         </div>
       </div>
     </footer>

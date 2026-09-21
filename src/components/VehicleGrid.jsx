@@ -2,6 +2,7 @@ import React from 'react';
 import { VehicleCard } from './VehicleCard';
 import { ArrowLeft, Package, MessageCircle } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const VehicleGrid = ({
   vehicles = [],
@@ -11,13 +12,14 @@ export const VehicleGrid = ({
   searchQuery
 }) => {
   const { companyInfo } = useAdmin();
+  const { language, t } = useLanguage();
 
   const isUnpublished = selectedLineObj?.status === 'No publicado';
   const displayTitle = selectedLineObj
-    ? selectedLineObj.title
+    ? (t(`lines.lineTitles.${selectedLineObj.id}`) || selectedLineObj.title)
     : searchQuery
-    ? `Resultados para: "${searchQuery}"`
-    : 'Catálogo de Modelos';
+    ? (language === 'es' ? `Resultados para: "${searchQuery}"` : `Results for: "${searchQuery}"`)
+    : t('vehicles.title');
 
   return (
     <section id="tienda" className="pt-2 pb-16 px-6 sm:px-10 lg:px-14 bg-gradient-to-b from-[#0d0f17] via-[#10121b] to-[#141722] scroll-mt-6">
@@ -30,11 +32,11 @@ export const VehicleGrid = ({
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-98 text-white text-xs font-bold transition-all border border-white/10 group shadow-md"
           >
             <ArrowLeft className="w-4 h-4 text-slate-300 group-hover:-translate-x-1 transition-transform" />
-            <span>Volver a Líneas de Procura</span>
+            <span>{language === 'es' ? 'Volver a Líneas de Procura' : 'Back to Procurement Lines'}</span>
           </button>
 
           <div className="text-xs text-slate-400">
-            Mostrando <strong className="text-white">{vehicles.length}</strong> {vehicles.length === 1 ? 'modelo' : 'modelos'}
+            {language === 'es' ? 'Mostrando' : 'Showing'} <strong className="text-white">{vehicles.length}</strong> {vehicles.length === 1 ? (language === 'es' ? 'modelo' : 'model') : (language === 'es' ? 'modelos' : 'models')}
           </div>
         </div>
 
@@ -50,7 +52,7 @@ export const VehicleGrid = ({
           <div className="relative z-10 space-y-2 max-w-2xl">
             <div className="flex items-center gap-2.5 flex-wrap">
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                Línea de Procura Seleccionada
+                {language === 'es' ? 'Línea de Procura Seleccionada' : 'Selected Procurement Line'}
               </span>
               {selectedLineObj && (
                 <span
@@ -60,7 +62,7 @@ export const VehicleGrid = ({
                       : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
                   }`}
                 >
-                  {selectedLineObj.status}
+                  {isUnpublished ? (language === 'es' ? 'No publicado' : 'Unpublished') : (language === 'es' ? 'Disponible' : 'Available')}
                 </span>
               )}
             </div>
@@ -71,8 +73,12 @@ export const VehicleGrid = ({
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
               {isUnpublished
-                ? 'Esta línea se encuentra en proceso de importación y selección de nuevos lotes en Dubái y China. Puedes solicitar cotizaciones personalizadas de modelos específicos bajo pedido.'
-                : 'Unidades verificadas en origen para importación bajo demanda con despacho directo a Venezuela (Puerto Cabello / La Guaira).'}
+                ? (language === 'es'
+                    ? 'Esta línea se encuentra en proceso de importación y selección de nuevos lotes en Dubái y China. Puedes solicitar cotizaciones personalizadas de modelos específicos bajo pedido.'
+                    : 'This line is currently in the process of sourcing new batches from Dubai and China. You can request custom quotes for specific models.')
+                : (language === 'es'
+                    ? 'Unidades verificadas en origen para importación bajo demanda con despacho directo a Venezuela (Puerto Cabello / La Guaira).'
+                    : 'Origin-verified units for on-demand import with direct dispatch to Venezuela (Puerto Cabello / La Guaira).')}
             </p>
           </div>
 
@@ -87,7 +93,7 @@ export const VehicleGrid = ({
               className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white text-xs font-bold transition-all shadow-lg shadow-emerald-950/40"
             >
               <MessageCircle className="w-4 h-4" />
-              <span>Consultar Asesor WhatsApp</span>
+              <span>{language === 'es' ? 'Consultar Asesor WhatsApp' : 'Consult via WhatsApp'}</span>
             </a>
           </div>
         </div>
@@ -98,16 +104,20 @@ export const VehicleGrid = ({
             <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center mx-auto">
               <Package className="w-6 h-6 text-slate-300" />
             </div>
-            <h4 className="text-base font-bold text-white">Catálogo en Proceso de Carga</h4>
+            <h4 className="text-base font-bold text-white">
+              {language === 'es' ? 'Catálogo en Proceso de Carga' : 'Catalog Loading in Progress'}
+            </h4>
             <p className="text-xs text-slate-400 leading-relaxed">
-              No hay unidades estándar publicadas en este momento para esta categoría. Si tienes en mente un modelo concreto, nuestro equipo en Dubái o China lo localiza para ti.
+              {language === 'es'
+                ? 'No hay unidades estándar publicadas en este momento para esta categoría. Si tienes en mente un modelo concreto, nuestro equipo en Dubái o China lo localiza para ti.'
+                : 'There are no standard units published at this time for this category. If you have a specific model in mind, our team in Dubai or China will locate it for you.'}
             </p>
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 onClick={onResetFilters}
                 className="px-5 py-2.5 rounded-xl bg-white text-black text-xs font-bold hover:bg-slate-200 transition-all shadow"
               >
-                Ver otras Líneas
+                {language === 'es' ? 'Ver otras Líneas' : 'View Other Lines'}
               </button>
             </div>
           </div>

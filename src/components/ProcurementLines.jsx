@@ -1,9 +1,11 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const ProcurementLines = ({ onSelectLine, selectedLine, onExploreAll }) => {
   const { linesList } = useAdmin();
+  const { t } = useLanguage();
 
   return (
     <section id="tienda" className="pt-2 pb-16 px-6 sm:px-10 lg:px-14 bg-gradient-to-b from-[#0d0f17] via-[#10121b] to-[#141722] scroll-mt-6">
@@ -12,7 +14,7 @@ export const ProcurementLines = ({ onSelectLine, selectedLine, onExploreAll }) =
         {/* Section Header */}
         <div className="mb-6">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Explora Nuestras Líneas de Procura
+            {t('lines.sectionTitle')}
           </h2>
         </div>
 
@@ -21,6 +23,7 @@ export const ProcurementLines = ({ onSelectLine, selectedLine, onExploreAll }) =
           {linesList.map((line) => {
             const isSelected = selectedLine === line.id;
             const isUnpublished = line.status === 'No publicado';
+            const translatedTitle = t(`lines.lineTitles.${line.id}`) || line.title;
 
             return (
               <div
@@ -41,7 +44,7 @@ export const ProcurementLines = ({ onSelectLine, selectedLine, onExploreAll }) =
                   <div className="absolute inset-0 z-0">
                     <img
                       src={line.image}
-                      alt={line.title}
+                      alt={translatedTitle}
                       className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${
                         isUnpublished ? 'opacity-20 grayscale' : 'opacity-45 group-hover:opacity-60'
                       }`}
@@ -50,11 +53,11 @@ export const ProcurementLines = ({ onSelectLine, selectedLine, onExploreAll }) =
                   </div>
                 )}
 
-                {/* Diagonal "No publicado" watermark (Matching screenshot 2) */}
+                {/* Diagonal "No publicado" watermark */}
                 {isUnpublished && (
                   <div className="absolute top-6 -right-10 rotate-45 pointer-events-none select-none z-10">
                     <span className="text-[11px] font-bold tracking-wider text-slate-300/80 bg-black/40 px-8 py-1 uppercase backdrop-blur-xs border-y border-white/10">
-                      No publicado
+                      {t('lines.unpublished')}
                     </span>
                   </div>
                 )}
@@ -62,7 +65,7 @@ export const ProcurementLines = ({ onSelectLine, selectedLine, onExploreAll }) =
                 {/* Top Title */}
                 <div className="relative z-10 pr-8">
                   <h3 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug drop-shadow-md">
-                    {line.title}
+                    {translatedTitle}
                   </h3>
                 </div>
 

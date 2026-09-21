@@ -1,6 +1,9 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const HeroAtlas = () => {
+  const { t } = useLanguage();
+
   return (
     <section id="inicio" className="relative bg-[#07080c] overflow-hidden min-h-[480px] sm:min-h-[520px] flex items-center">
       
@@ -23,14 +26,14 @@ export const HeroAtlas = () => {
           
           {/* Main Title */}
           <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-black text-white tracking-tight leading-[1.12] drop-shadow-md">
-            El camino más<br />
-            rápido y seguro<br />
-            para tu vehículo
+            {t('hero.titleLine1')}<br />
+            {t('hero.titleLine2')}<br />
+            {t('hero.titleLine3')}
           </h1>
 
           {/* Subtitle / Paragraph */}
           <p className="text-sm sm:text-base text-slate-200 font-normal leading-relaxed max-w-xl drop-shadow">
-            Transformamos la logística automotriz en una experiencia 100% digital y transparente. Con Atlas, seleccionas tu modelo, sigues el trayecto en tiempo real y recibes tu vehículo listo para rodar en Venezuela de la manera más sencilla posible.
+            {t('hero.description')}
           </p>
 
         </div>
