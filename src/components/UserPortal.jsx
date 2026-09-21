@@ -256,12 +256,12 @@ export const UserPortal = () => {
             <span className={language === 'en' ? 'text-white font-extrabold' : 'text-slate-400'}>EN</span>
           </button>
 
-          {/* Botón Mi Perfil */}
+          {/* Botón Mi Perfil en la esquina superior derecha (Conmutador exclusivo de datos básicos y foto) */}
           <button
-            onClick={() => setActiveTab('profile')}
-            className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border transition-all ${
+            onClick={() => setActiveTab(activeTab === 'profile' ? 'orders' : 'profile')}
+            className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer ${
               activeTab === 'profile'
-                ? 'bg-white text-black border-white shadow-lg ring-2 ring-white/20'
+                ? 'bg-white text-black border-white shadow-lg ring-2 ring-white/20 scale-102'
                 : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300 hover:text-white'
             }`}
             title={isEn ? 'View and edit My Profile' : 'Ver y editar Mi Perfil'}
@@ -275,20 +275,25 @@ export const UserPortal = () => {
                 <span>{currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}</span>
               )}
             </div>
-            <span className="text-xs font-bold hidden sm:inline">
-              {isEn ? 'My Profile' : 'Mi Perfil'}
-            </span>
+            <div className="text-left hidden sm:block leading-tight">
+              <span className={`text-xs font-bold block truncate max-w-[130px] ${activeTab === 'profile' ? 'text-black' : 'text-white'}`}>
+                {currentUser?.name || (isEn ? 'Customer' : 'Cliente')}
+              </span>
+              <span className={`text-[10px] font-medium block ${activeTab === 'profile' ? 'text-slate-700' : 'text-slate-400'}`}>
+                {isEn ? 'My Profile' : 'Mi Perfil'}
+              </span>
+            </div>
           </button>
         </div>
       </header>
 
-      {/* ================= PESTAÑAS DE NAVEGACIÓN ================= */}
+      {/* ================= PESTAÑAS DE NAVEGACIÓN (SUBMENÚ EXCLUSIVO DE PEDIDOS) ================= */}
       <div className="bg-[#0f1118] border-b border-white/10 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-3 overflow-x-auto py-3 scrollbar-none">
           {/* Pestaña 1: Mis Pedidos */}
           <button
             onClick={() => setActiveTab('orders')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'orders'
                 ? 'bg-white text-black shadow-lg'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -304,7 +309,7 @@ export const UserPortal = () => {
           {/* Pestaña 2: Mis Favoritos (Submenú en la sección de pedidos) */}
           <button
             onClick={() => setActiveTab('favorites')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'favorites'
                 ? 'bg-white text-black shadow-lg'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -320,7 +325,7 @@ export const UserPortal = () => {
           {/* Pestaña 3: Seguimiento de Vehículo (con mapa satelital) */}
           <button
             onClick={() => setActiveTab('tracking')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'tracking'
                 ? 'bg-white text-black shadow-lg'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -329,19 +334,6 @@ export const UserPortal = () => {
             <Navigation className="w-4 h-4" />
             <span>{isEn ? 'Vehicle Tracking' : 'Seguimiento de Vehículo'}</span>
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          </button>
-
-          {/* Pestaña 4: Mi Perfil */}
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
-              activeTab === 'profile'
-                ? 'bg-white text-black shadow-lg'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <User className="w-4 h-4" />
-            <span>{isEn ? 'My Profile' : 'Mi Perfil'}</span>
           </button>
         </div>
       </div>
