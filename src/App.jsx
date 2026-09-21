@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { CartProvider, useCart } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 import { AdminProvider, useAdmin } from './context/AdminContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
@@ -17,7 +18,8 @@ import { Toast } from './components/Toast';
 import { AdminPortal } from './components/AdminPortal';
 import { UserPortal } from './components/UserPortal';
 import { AuthModal } from './components/AuthModal';
-import { Menu, ShoppingCart, ShieldAlert, Package } from 'lucide-react';
+import { Menu, ShoppingCart, ShieldAlert, Package, Heart } from 'lucide-react';
+import { useWishlist } from './context/WishlistContext';
 
 function AtlasPublicStore() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,6 +30,7 @@ function AtlasPublicStore() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { cartCount, setIsCartOpen } = useCart();
+  const { wishlistCount } = useWishlist();
   const { publishedVehicles = [], publishedLines = [] } = useAdmin();
   const { currentUser, setCurrentView, setIsAuthModalOpen } = useAuth();
   const { language, toggleLanguage } = useLanguage();
@@ -107,6 +110,24 @@ function AtlasPublicStore() {
             <span className={language === 'es' ? 'text-white font-black' : 'text-slate-400 font-medium'}>ES</span>
             <span className="text-slate-600">|</span>
             <span className={language === 'en' ? 'text-white font-black' : 'text-slate-400 font-medium'}>EN</span>
+          </button>
+
+          {/* Mobile Wishlist Button */}
+          <button
+            onClick={() => {
+              const tiendaEl = document.getElementById('tienda');
+              if (tiendaEl) tiendaEl.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="relative p-2 rounded-full bg-white/10 text-white hover:bg-white/20"
+            aria-label="Favoritos"
+            title={language === 'es' ? `Favoritos (${wishlistCount})` : `Wishlist (${wishlistCount})`}
+          >
+            <Heart className={`w-4 h-4 ${wishlistCount > 0 ? 'text-red-500 fill-red-500' : 'text-white'}`} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-bold flex items-center justify-center">
+                {wishlistCount}
+              </span>
+            )}
           </button>
 
           <button
@@ -215,9 +236,11 @@ export default function App() {
     <LanguageProvider>
       <AuthProvider>
         <AdminProvider>
-          <CartProvider>
-            <MainView />
-          </CartProvider>
+          <WishlistProvider>
+            <CartProvider>
+              <MainView />
+            </CartProvider>
+          </WishlistProvider>
         </AdminProvider>
       </AuthProvider>
     </LanguageProvider>

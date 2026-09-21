@@ -5,7 +5,8 @@ export const procurementLines = [
     status: 'No publicado',
     image: 'https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=800&q=80',
     type: 'vehicles',
-    isAvailable: false
+    isAvailable: false,
+    description: 'Capacidad de carga pesada, chasis reforzado y tracción todoterreno para las faenas más exigentes.'
   },
   {
     id: 'suv',
@@ -13,7 +14,8 @@ export const procurementLines = [
     status: 'Disponible',
     image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=80',
     type: 'vehicles',
-    isAvailable: true
+    isAvailable: true,
+    description: 'Confort premium, seguridad activa y espacio familiar para viajes largos con tracción 4x4.'
   },
   {
     id: 'compactos',
@@ -21,7 +23,8 @@ export const procurementLines = [
     status: 'No publicado',
     image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=80',
     type: 'vehicles',
-    isAvailable: false
+    isAvailable: false,
+    description: 'Agilidad urbana y consumo óptimo de combustible con mantenimiento accesible.'
   },
   {
     id: 'electric-scooters',
@@ -29,7 +32,8 @@ export const procurementLines = [
     status: 'No publicado',
     image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80',
     type: 'scooters',
-    isAvailable: false
+    isAvailable: false,
+    description: 'Movilidad 100% eléctrica, cero emisiones y recarga en tomacorrientes domésticos.'
   },
   {
     id: 'motos-efficiency',
@@ -37,7 +41,8 @@ export const procurementLines = [
     status: 'Disponible',
     image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80',
     type: 'motorcycles',
-    isAvailable: true
+    isAvailable: true,
+    description: 'Diseñada para el máximo rendimiento diario. Motores de alta durabilidad y tecnología de optimización de combustible ideal para flotas comerciales, entregas y trabajadores que exigen el menor costo por kilómetro sin sacrificar resistencia.'
   },
   {
     id: 'motos-power',
@@ -45,7 +50,8 @@ export const procurementLines = [
     status: 'Disponible',
     image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80',
     type: 'motorcycles',
-    isAvailable: true
+    isAvailable: true,
+    description: 'Aceleración deportiva, tecnología DOHC de alta compresión y frenos de alto rendimiento para carretera.'
   },
   {
     id: 'motos-smart',
@@ -53,7 +59,8 @@ export const procurementLines = [
     status: 'Disponible',
     image: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=800&q=80',
     type: 'motorcycles',
-    isAvailable: true
+    isAvailable: true,
+    description: 'Tecnología digital inteligente, conectividad Bluetooth, tableros TFT y telemetría avanzada.'
   },
   {
     id: 'vehiculos-electricos',
@@ -61,7 +68,8 @@ export const procurementLines = [
     status: 'No publicado',
     image: 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=800&q=80',
     type: 'electric',
-    isAvailable: false
+    isAvailable: false,
+    description: 'Vanguardia automotriz con baterías de largo alcance, autonomía extendida y tecnología silenciosa.'
   }
 ];
 
@@ -69,7 +77,7 @@ export const vehicles = [
   {
     id: 'moto-eff-1',
     lineId: 'motos-efficiency',
-    name: 'Atlas Titan 150 EcoMax',
+    name: 'Splendor XTEC (125cc)',
     line: 'Motos: Efficiency Line',
     category: 'Motos',
     price: 1350.00,
@@ -77,24 +85,25 @@ export const vehicles = [
     origin: 'Dubái / China',
     destination: 'Venezuela (Puerto Cabello / La Guaira)',
     transitDays: '30 - 38 días',
-    engine: '150cc 4T Monocilíndrico',
-    power: '12.5 HP @ 8500 rpm',
-    fuelEconomy: '48 km / litro',
-    brakes: 'Disco delantero / Tambor trasero',
+    engine: '125cc 4T Monocilíndrico EcoThrust',
+    power: '11.8 HP @ 8000 rpm',
+    fuelEconomy: '52 km / litro',
+    brakes: 'Disco delantero / Tambor trasero con frenada combinada',
     transmission: '5 velocidades mecánica',
     rating: 4.9,
-    reviewsCount: 38,
+    reviewsCount: 44,
     badge: 'Más Solicitada',
     image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80'
     ],
-    description: 'Diseñada para máxima durabilidad, trabajo continuo y ahorro insuperable de combustible. Sistema de carburación optimizado para combustible estándar venezolano y chasis reforzado.',
+    description: 'Diseñada para el máximo rendimiento diario. Motores de alta durabilidad y tecnología de optimización de combustible ideal para flotas comerciales, entregas y trabajadores que exigen el menor costo por kilómetro sin sacrificar resistencia.',
     specs: [
-      { label: 'Cilindrada', value: '149.5 cc' },
-      { label: 'Consumo', value: '2.1 L / 100 km' },
-      { label: 'Capacidad Tanque', value: '13 Litros' },
+      { label: 'Cilindrada', value: '124.7 cc' },
+      { label: 'Consumo', value: '1.9 L / 100 km' },
+      { label: 'Capacidad Tanque', value: '11.5 Litros' },
       { label: 'Encendido', value: 'Eléctrico y Pedal' },
       { label: 'Garantía', value: '1 Año o 15.000 km' }
     ],
@@ -125,7 +134,8 @@ export const vehicles = [
     image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80'
     ],
     description: 'Potencia pura y aceleración deportiva con postura ergonómica. Motor de inyección electrónica Delphi con refrigeración líquida de alto flujo y escape en acero inoxidable.',
     specs: [
@@ -161,7 +171,9 @@ export const vehicles = [
     badge: 'Tecnología Inteligente',
     image: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=800&q=80',
     images: [
-      'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80'
     ],
     description: 'Conectividad Bluetooth integrada, tablero TFT a color con navegación paso a paso, iluminación Full LED matricial y puerto USB dual de carga rápida para dispositivos móviles.',
     specs: [
@@ -197,7 +209,9 @@ export const vehicles = [
     badge: 'Bajo Demanda',
     image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=80',
     images: [
-      'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80'
     ],
     description: 'SUV todoterreno de gran porte y lujo interior. Techo panorámico corredizo, asientos de cuero ventilados, tracción 4x4 inteligente con modos de terreno y paquete de asistencia avanzada al conductor ADAS.',
     specs: [
@@ -232,7 +246,11 @@ export const vehicles = [
     reviewsCount: 22,
     badge: 'Carga Pesada',
     image: 'https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=800&q=80',
-    images: ['https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=800&q=80'],
+    images: [
+      'https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1551830820-330a71b99659?auto=format&fit=crop&w=800&q=80'
+    ],
     description: 'Camioneta Pick-up de alto torque y capacidad de carga de 1.2 toneladas. Chasis de alta resistencia preparado para el trabajo rudo y carreteras difíciles en Venezuela.',
     specs: [
       { label: 'Cilindrada', value: '2.499 cc Turbo Diésel' },
@@ -266,7 +284,11 @@ export const vehicles = [
     reviewsCount: 14,
     badge: 'Económico',
     image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=80',
-    images: ['https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=80'],
+    images: [
+      'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=800&q=80'
+    ],
     description: 'Vehículo compacto ideal para la ciudad. Excelente rendimiento de combustible, aire acondicionado de alto poder y suspensión reforzada para baches urbanos.',
     specs: [
       { label: 'Motor', value: '1.6L 4 Cilindros Gasolina' },
@@ -299,7 +321,11 @@ export const vehicles = [
     reviewsCount: 19,
     badge: 'Cero Emisiones',
     image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80',
-    images: ['https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80'],
+    images: [
+      'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=800&q=80'
+    ],
     description: 'Scooter 100% eléctrico para movilidad urbana ágil. Batería de Litio extraíble recargable en cualquier tomacorriente estándar de 110V en 4 horas.',
     specs: [
       { label: 'Batería', value: 'Litio 72V 32Ah Extraíble' },
@@ -332,7 +358,11 @@ export const vehicles = [
     reviewsCount: 8,
     badge: 'Alta Tecnología',
     image: 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=800&q=80',
-    images: ['https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=800&q=80'],
+    images: [
+      'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80'
+    ],
     description: 'Vehículo eléctrico de última generación con batería Blade de alta durabilidad y cargador inteligente portátil incluido para redes residenciales.',
     specs: [
       { label: 'Batería', value: 'Litio Ferrofosfato (LFP) 70 kWh' },

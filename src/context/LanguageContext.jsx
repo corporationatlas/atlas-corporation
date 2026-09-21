@@ -85,9 +85,24 @@ export const translations = {
       power: 'Potencia',
       fuelEconomy: 'Consumo',
       transmission: 'Transmisión',
-      brakes: 'Frenos',
       mostRequested: 'Más Solicitada',
-      availableUnit: 'Unidad Disponible'
+      availableUnit: 'Unidad Disponible',
+      addToWishlist: 'Añadir a la lista de deseos',
+      inWishlist: 'En tu lista de deseos',
+      favorite: 'Favoritos',
+      searchIn: 'Buscar en',
+      sortBy: 'Ordenar por:',
+      sortFeatured: 'Destacado',
+      sortPriceAsc: 'Precio: Menor a Mayor',
+      sortPriceDesc: 'Precio: Mayor a Menor',
+      sortNameAsc: 'Nombre: A - Z',
+      allProducts: 'Todos los productos',
+      addToBasket: 'Añadir a la cesta',
+      termsLink: 'Términos y condiciones',
+      returnPolicy: 'Garantía de devolución de 30 días',
+      shippingTime: 'Envío: 2-3 días hábiles',
+      viewFullSpecs: 'Ver Ficha Técnica Completa',
+      hideFullSpecs: 'Ocultar Ficha Técnica'
     },
     // Vehicle Detail Modal
     vehicleModal: {
@@ -375,9 +390,24 @@ export const translations = {
       power: 'Power',
       fuelEconomy: 'Fuel Economy',
       transmission: 'Transmission',
-      brakes: 'Brakes',
       mostRequested: 'Most Requested',
-      availableUnit: 'Available Unit'
+      availableUnit: 'Available Unit',
+      addToWishlist: 'Add to wishlist',
+      inWishlist: 'In your wishlist',
+      favorite: 'Wishlist',
+      searchIn: 'Search in',
+      sortBy: 'Sort by:',
+      sortFeatured: 'Featured',
+      sortPriceAsc: 'Price: Low to High',
+      sortPriceDesc: 'Price: High to Low',
+      sortNameAsc: 'Name: A - Z',
+      allProducts: 'All products',
+      addToBasket: 'Add to cart',
+      termsLink: 'Terms and conditions',
+      returnPolicy: '30-day return guarantee',
+      shippingTime: 'Shipping: 2-3 business days',
+      viewFullSpecs: 'View Full Technical Specs',
+      hideFullSpecs: 'Hide Technical Specs'
     },
     // Vehicle Detail Modal
     vehicleModal: {

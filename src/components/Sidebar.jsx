@@ -1,6 +1,7 @@
 import React from 'react';
-import { ShoppingCart, Search, User, ShieldAlert, LogOut, Package, ArrowRight, X, Globe } from 'lucide-react';
+import { ShoppingCart, Search, User, ShieldAlert, LogOut, Package, ArrowRight, X, Globe, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { useAdmin } from '../context/AdminContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -15,6 +16,7 @@ export const Sidebar = ({
   onResetFilters
 }) => {
   const { cartCount, setIsCartOpen } = useCart();
+  const { wishlistCount } = useWishlist();
   const { companyInfo } = useAdmin();
   const { currentUser, setCurrentView, setIsAuthModalOpen, logout } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
@@ -82,6 +84,24 @@ export const Sidebar = ({
                 <span className={language === 'es' ? 'text-white font-black' : 'text-slate-500 font-semibold'}>ES</span>
                 <span className="text-slate-600 text-[10px]">/</span>
                 <span className={language === 'en' ? 'text-white font-black' : 'text-slate-500 font-semibold'}>EN</span>
+              </button>
+
+              {/* Wishlist Header Button */}
+              <button
+                onClick={() => {
+                  const tiendaEl = document.getElementById('tienda');
+                  if (tiendaEl) tiendaEl.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="relative w-10 h-10 rounded-xl bg-[#141720]/80 hover:bg-[#1e2330] text-white flex items-center justify-center transition-all border border-white/15 hover:border-white/30 shadow-md group"
+                title={language === 'es' ? `Favoritos (${wishlistCount})` : `Wishlist (${wishlistCount})`}
+                aria-label="Favoritos"
+              >
+                <Heart className={`w-4 h-4 ${wishlistCount > 0 ? 'text-red-500 fill-red-500' : 'text-slate-200'} group-hover:scale-110 transition-all`} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center border-2 border-[#06070a] shadow-sm">
+                    {wishlistCount}
+                  </span>
+                )}
               </button>
 
               <button
