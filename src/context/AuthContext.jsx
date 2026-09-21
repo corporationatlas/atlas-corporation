@@ -335,7 +335,7 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(updated);
 
     try {
-      localStorage.setItem('atlas_auth_session_v1', JSON.stringify(updated));
+      localStorage.setItem('atlas_auth_session_v2', JSON.stringify(updated));
     } catch (e) {
       console.error(e);
     }

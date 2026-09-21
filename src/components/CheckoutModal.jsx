@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   CheckCircle2,
@@ -18,12 +18,14 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAdmin } from '../context/AdminContext';
+import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ProformaInvoiceModal } from './ProformaInvoiceModal';
 
 export const CheckoutModal = ({ isOpen, onClose }) => {
   const { cart, total, clearCart } = useCart();
   const { addOrder, getNextOrderNumber } = useAdmin();
+  const { currentUser } = useAuth();
   const { language, t } = useLanguage();
   const isEn = language === 'en';
   
@@ -35,15 +37,29 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
   const [createdOrderData, setCreatedOrderData] = useState(null);
 
   const [formData, setFormData] = useState({
-    nombre: '',
-    cedula: '',
-    email: '',
-    telefono: '',
-    ciudad: 'Caracas',
+    nombre: currentUser?.name || '',
+    cedula: currentUser?.cedula || '',
+    email: currentUser?.email || '',
+    telefono: currentUser?.phone || '',
+    ciudad: currentUser?.city || 'Caracas',
     estado: 'Distrito Capital',
-    direccionEntrega: '',
+    direccionEntrega: currentUser?.address || '',
     metodoPago: 'binance'
   });
+
+  useEffect(() => {
+    if (currentUser && isOpen) {
+      setFormData((prev) => ({
+        ...prev,
+        nombre: currentUser.name || prev.nombre,
+        cedula: currentUser.cedula || prev.cedula,
+        email: currentUser.email || prev.email,
+        telefono: currentUser.phone || prev.telefono,
+        ciudad: currentUser.city || prev.ciudad,
+        direccionEntrega: currentUser.address || prev.direccionEntrega
+      }));
+    }
+  }, [currentUser, isOpen]);
 
   if (!isOpen) return null;
 
@@ -68,6 +84,7 @@ export const CheckoutModal = ({ isOpen, onClose }) => {
 
       const orderRecord = {
         id: generatedTracking,
+        userId: currentUser?.id || currentUser?.uid || null,
         date: new Date().toISOString().split('T')[0],
         nombre: formData.nombre,
         cedula: formData.cedula,

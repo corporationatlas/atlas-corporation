@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Package,
   MapPin,
@@ -23,35 +23,58 @@ import {
   ChevronRight,
   AlertCircle,
   FileText,
-  Lock
+  Lock,
+  Heart,
+  ShoppingCart
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAdmin } from '../context/AdminContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
 import { ProformaInvoiceModal } from './ProformaInvoiceModal';
+import { VehicleModal } from './VehicleModal';
 
 export const UserPortal = () => {
   const { currentUser, setCurrentView, logout, updateUserProfile, setIsAuthModalOpen } = useAuth();
   const { ordersList } = useAdmin();
+  const { wishlist, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
   const { language, toggleLanguage, t } = useLanguage();
   const isEn = language === 'en';
 
-  // Tabs: 'orders' | 'tracking' | 'profile'
+  // Tabs: 'orders' | 'favorites' | 'tracking' | 'profile'
   const [activeTab, setActiveTab] = useState('orders');
   const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState(null);
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+  const [selectedModalVehicle, setSelectedModalVehicle] = useState(null);
+  const [addedVehicleId, setAddedVehicleId] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Formulario de datos básicos
+  // Formulario de datos básicos aislado por usuario
   const [profileForm, setProfileForm] = useState({
     name: currentUser?.name || '',
     email: currentUser?.email || '',
     cedula: currentUser?.cedula || '',
     phone: currentUser?.phone || '',
-    city: currentUser?.city || 'Valencia',
-    address: currentUser?.address || 'Urb. El Parral, Av. 137, Res. Los Sauces'
+    city: currentUser?.city || 'Caracas',
+    address: currentUser?.address || ''
   });
   const [profileSaved, setProfileSaved] = useState(false);
+
+  // Sincronizar formulario dinámicamente cuando cambia de usuario
+  useEffect(() => {
+    if (currentUser) {
+      setProfileForm({
+        name: currentUser.name || '',
+        email: currentUser.email || '',
+        cedula: currentUser.cedula || '',
+        phone: currentUser.phone || '',
+        city: currentUser.city || 'Caracas',
+        address: currentUser.address || ''
+      });
+    }
+  }, [currentUser]);
 
   // GUARDA DE SEGURIDAD ESTRICTA: Bloqueo absoluto si no hay sesión iniciada
   if (!currentUser) {
@@ -91,10 +114,11 @@ export const UserPortal = () => {
     );
   }
 
-  // Filtrar pedidos del usuario de forma estricta (solo pedidos que coincidan con su email o cédula)
+  // Filtrar pedidos del usuario de forma estricta (aislamiento total por userId, email o cédula)
   const myOrders = ordersList.filter(
     (o) =>
-      (o.email && o.email.toLowerCase() === currentUser.email?.toLowerCase()) ||
+      (o.userId && (o.userId === currentUser.id || o.userId === currentUser.uid)) ||
+      (o.email && currentUser.email && o.email.toLowerCase() === currentUser.email.toLowerCase()) ||
       (currentUser.cedula && o.cedula && o.cedula.toLowerCase() === currentUser.cedula.toLowerCase())
   );
 
@@ -260,7 +284,7 @@ export const UserPortal = () => {
 
       {/* ================= PESTAÑAS DE NAVEGACIÓN ================= */}
       <div className="bg-[#0f1118] border-b border-white/10 px-4 sm:px-8">
-        <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-4 overflow-x-auto py-3 scrollbar-none">
+        <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-3 overflow-x-auto py-3 scrollbar-none">
           {/* Pestaña 1: Mis Pedidos */}
           <button
             onClick={() => setActiveTab('orders')}
@@ -277,7 +301,23 @@ export const UserPortal = () => {
             </span>
           </button>
 
-          {/* Pestaña 2: Seguimiento de Vehículo (con mapa) */}
+          {/* Pestaña 2: Mis Favoritos (Submenú en la sección de pedidos) */}
+          <button
+            onClick={() => setActiveTab('favorites')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
+              activeTab === 'favorites'
+                ? 'bg-white text-black shadow-lg'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Heart className={`w-4 h-4 ${wishlist.length > 0 ? 'text-red-500 fill-red-500' : 'text-slate-400'}`} />
+            <span>{isEn ? 'My Wishlist' : 'Mis Favoritos'}</span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${activeTab === 'favorites' ? 'bg-black text-white' : 'bg-white/10 text-slate-300'}`}>
+              {wishlist.length}
+            </span>
+          </button>
+
+          {/* Pestaña 3: Seguimiento de Vehículo (con mapa satelital) */}
           <button
             onClick={() => setActiveTab('tracking')}
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
@@ -289,6 +329,19 @@ export const UserPortal = () => {
             <Navigation className="w-4 h-4" />
             <span>{isEn ? 'Vehicle Tracking' : 'Seguimiento de Vehículo'}</span>
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          </button>
+
+          {/* Pestaña 4: Mi Perfil */}
+          <button
+            onClick={() => setActiveTab('profile')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
+              activeTab === 'profile'
+                ? 'bg-white text-black shadow-lg'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <User className="w-4 h-4" />
+            <span>{isEn ? 'My Profile' : 'Mi Perfil'}</span>
           </button>
         </div>
       </div>
@@ -495,7 +548,151 @@ export const UserPortal = () => {
           </div>
         )}
 
-        {/* ================= TAB 2: SEGUIMIENTO DE VEHÍCULO (MAPA SATELITAL DIGITAL) ================= */}
+        {/* ================= TAB: MIS FAVORITOS (SUBMENÚ CLIENTE) ================= */}
+        {activeTab === 'favorites' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+                  <Heart className="w-6 h-6 text-red-500 fill-red-500" />
+                  <span>{isEn ? 'My Saved Vehicles' : 'Mis Vehículos Favoritos'}</span>
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  {isEn
+                    ? 'Units saved for direct procurement, instant quotes, or fast booking.'
+                    : 'Unidades guardadas para procura directa, cotización instantánea o reserva ágil.'}
+                </p>
+              </div>
+
+              {wishlist.length > 0 && (
+                <button
+                  onClick={() => setCurrentView('store')}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white text-xs font-semibold border border-white/10 transition-all self-start sm:self-auto cursor-pointer"
+                >
+                  <ChevronRight className="w-4 h-4 rotate-180" />
+                  <span>{isEn ? 'Explore Catalog' : 'Explorar Catálogo'}</span>
+                </button>
+              )}
+            </div>
+
+            {wishlist.length === 0 ? (
+              <div className="bg-[#10121a] border border-white/10 rounded-3xl p-12 text-center max-w-lg mx-auto space-y-4 shadow-xl">
+                <div className="w-16 h-16 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center mx-auto border border-red-500/20 shadow-inner">
+                  <Heart className="w-8 h-8" />
+                </div>
+                <h3 className="text-lg font-black text-white">
+                  {isEn ? 'No vehicles in your wishlist yet' : 'Aún no tienes vehículos en tus favoritos'}
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
+                  {isEn
+                    ? 'Explore our inventory and click the heart icon on any model to keep it saved in your private customer portal.'
+                    : 'Explora nuestro catálogo de procura internacional y presiona el corazón en cualquier modelo para tenerlo guardado en tu panel privado.'}
+                </p>
+                <div className="pt-2">
+                  <button
+                    onClick={() => setCurrentView('store')}
+                    className="px-6 py-2.5 rounded-xl bg-white text-black font-bold text-xs hover:bg-slate-200 transition-all shadow-lg active:scale-98 cursor-pointer"
+                  >
+                    {isEn ? 'Explore Catalog' : 'Explorar Catálogo'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {wishlist.map((vehicle) => {
+                  const isJustAdded = addedVehicleId === vehicle.id;
+                  return (
+                    <div
+                      key={vehicle.id}
+                      className="bg-[#10121a] border border-white/10 rounded-2xl overflow-hidden hover:border-white/25 transition-all shadow-lg flex flex-col group"
+                    >
+                      {/* Imagen con Aspect Ratio Preservado y Máxima Calidad */}
+                      <div className="relative aspect-[4/3] bg-[#08090d] overflow-hidden flex items-center justify-center p-3 border-b border-white/5">
+                        <img
+                          src={vehicle.image}
+                          alt={vehicle.name}
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <span className="absolute top-3 left-3 px-2.5 py-1 text-[10px] font-bold rounded-lg bg-black/80 text-slate-300 border border-white/10 backdrop-blur-xs flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-red-500" />
+                          <span>{vehicle.origin || 'Dubái'} ➔ {vehicle.destination || 'Venezuela'}</span>
+                        </span>
+                        <button
+                          onClick={() => removeFromWishlist(vehicle.id)}
+                          className="absolute top-3 right-3 p-1.5 rounded-lg bg-black/80 hover:bg-red-500 text-slate-400 hover:text-white transition-colors border border-white/10 cursor-pointer"
+                          title={isEn ? 'Remove from wishlist' : 'Quitar de favoritos'}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Detalles */}
+                      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                        <div>
+                          <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400">
+                            {vehicle.line || vehicle.category}
+                          </span>
+                          <h4 className="text-base font-bold text-white leading-tight mt-0.5">
+                            {vehicle.name}
+                          </h4>
+                          <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                            {vehicle.description}
+                          </p>
+                        </div>
+
+                        <div className="pt-2 border-t border-white/5 flex items-baseline justify-between">
+                          <div>
+                            <span className="text-[10px] text-slate-400 block font-medium">
+                              {isEn ? 'CIF Price / Base' : 'Precio Procura CIF'}
+                            </span>
+                            <span className="text-lg font-black text-white">
+                              ${vehicle.price?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          {vehicle.transitDays && (
+                            <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-slate-500" />
+                              <span>{vehicle.transitDays}</span>
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Botones de Acción */}
+                        <div className="pt-1 flex gap-2">
+                          <button
+                            onClick={() => {
+                              addToCart(vehicle, 1);
+                              setAddedVehicleId(vehicle.id);
+                              setTimeout(() => setAddedVehicleId(null), 1500);
+                            }}
+                            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow active:scale-98 cursor-pointer ${
+                              isJustAdded
+                                ? 'bg-emerald-500 text-black'
+                                : 'bg-white text-black hover:bg-slate-200'
+                            }`}
+                          >
+                            <ShoppingCart className="w-3.5 h-3.5" />
+                            <span>{isJustAdded ? (isEn ? 'Added!' : '¡Añadido!') : (isEn ? 'Add to Basket' : 'Añadir a la cesta')}</span>
+                          </button>
+
+                          <button
+                            onClick={() => setSelectedModalVehicle(vehicle)}
+                            className="py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-semibold border border-white/10 transition-colors cursor-pointer"
+                            title={isEn ? 'View technical specs' : 'Ver ficha técnica'}
+                          >
+                            {isEn ? 'Details' : 'Ver Ficha'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ================= TAB 3: SEGUIMIENTO DE VEHÍCULO (MAPA SATELITAL DIGITAL) ================= */}
         {activeTab === 'tracking' && (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -981,6 +1178,14 @@ export const UserPortal = () => {
         onClose={() => setIsInvoiceOpen(false)}
         order={selectedInvoiceOrder}
       />
+
+      {/* Modal de Ficha Técnica Completa desde Favoritos */}
+      {selectedModalVehicle && (
+        <VehicleModal
+          vehicle={selectedModalVehicle}
+          onClose={() => setSelectedModalVehicle(null)}
+        />
+      )}
     </div>
   );
 };

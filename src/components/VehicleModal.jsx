@@ -146,19 +146,19 @@ export const VehicleModal = ({ vehicle, isOpen, onClose }) => {
             <span className="text-slate-200 font-semibold">{vehicle.name}</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6 sm:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6 sm:p-8 items-start">
             
-            {/* 2. Columna Izquierda: Galería con Miniaturas Verticales + Imagen Principal con Flechas */}
-            <div className="md:col-span-7 flex gap-3 sm:gap-4">
+            {/* 2. Columna Izquierda: Galería con Miniaturas Verticales + Imagen Principal con Relación de Aspecto y Resolución Preservada */}
+            <div className="md:col-span-7 flex gap-3 sm:gap-4 self-start">
               
-              {/* Miniaturas Verticales a la Izquierda - Referencia 2 */}
+              {/* Miniaturas Verticales a la Izquierda */}
               {images.length > 1 && (
-                <div className="flex flex-col gap-2.5 w-16 sm:w-20 shrink-0">
+                <div className="flex flex-col gap-2.5 w-16 sm:w-20 shrink-0 self-start">
                   {images.map((imgUrl, idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveImageIndex(idx)}
-                      className={`relative aspect-square rounded-xl overflow-hidden bg-[#090a0f] border-2 transition-all duration-200 ${
+                      className={`relative aspect-square rounded-xl overflow-hidden bg-[#08090d] border-2 transition-all duration-200 ${
                         activeImageIndex === idx
                           ? 'border-white shadow-lg ring-1 ring-white/50 scale-102'
                           : 'border-white/10 opacity-60 hover:opacity-100 hover:border-white/30'
@@ -167,26 +167,27 @@ export const VehicleModal = ({ vehicle, isOpen, onClose }) => {
                       <img
                         src={imgUrl}
                         alt={`${vehicle.name} miniatura ${idx + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain p-1"
                       />
                     </button>
                   ))}
                 </div>
               )}
 
-              {/* Imagen Principal Grande con Flechas de Carrusel < y > - Referencia 2 */}
-              <div className="relative flex-1 aspect-square rounded-2xl overflow-hidden bg-[#090a0f] border border-white/10 flex items-center justify-center group select-none">
+              {/* Imagen Principal Grande: Contenedor con aspect-ratio fijo, resolución máxima y sin distorsión al abrir ficha técnica */}
+              <div className="relative flex-1 aspect-[4/3] sm:aspect-square max-h-[460px] rounded-2xl overflow-hidden bg-[#08090d] border border-white/10 flex items-center justify-center group select-none self-start">
                 <img
                   src={images[activeImageIndex] || vehicle.image}
                   alt={vehicle.name}
-                  className="w-full h-full object-cover transition-transform duration-500"
+                  className="w-full h-full object-contain p-2 transition-transform duration-300 select-none"
+                  loading="eager"
                 />
 
                 {/* Flecha Izquierda < */}
                 {images.length > 1 && (
                   <button
                     onClick={handlePrevImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center border border-white/20 transition-all shadow-lg active:scale-95"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center border border-white/20 transition-all shadow-lg active:scale-95 z-20 cursor-pointer"
                     aria-label="Imagen anterior"
                   >
                     <ChevronLeft className="w-5 h-5" />
@@ -197,7 +198,7 @@ export const VehicleModal = ({ vehicle, isOpen, onClose }) => {
                 {images.length > 1 && (
                   <button
                     onClick={handleNextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center border border-white/20 transition-all shadow-lg active:scale-95"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center border border-white/20 transition-all shadow-lg active:scale-95 z-20 cursor-pointer"
                     aria-label="Imagen siguiente"
                   >
                     <ChevronRight className="w-5 h-5" />
@@ -205,7 +206,7 @@ export const VehicleModal = ({ vehicle, isOpen, onClose }) => {
                 )}
 
                 {/* Origen Logístico sutil */}
-                <span className="absolute bottom-3 left-3 px-2.5 py-1 text-[10px] font-bold rounded-lg bg-black/70 text-slate-300 border border-white/10 backdrop-blur-xs flex items-center gap-1">
+                <span className="absolute bottom-3 left-3 px-2.5 py-1 text-[10px] font-bold rounded-lg bg-black/75 text-slate-300 border border-white/10 backdrop-blur-xs flex items-center gap-1 z-10">
                   <MapPin className="w-3 h-3 text-red-500" />
                   <span>{vehicle.origin || 'Dubái'} ➔ {vehicle.destination || 'Venezuela'}</span>
                 </span>

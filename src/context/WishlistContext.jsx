@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const WishlistContext = createContext();
 
@@ -11,9 +12,13 @@ export const useWishlist = () => {
 };
 
 export const WishlistProvider = ({ children }) => {
-  const [wishlist, setWishlist] = useState(() => {
+  const { currentUser } = useAuth();
+  const userKey = currentUser ? (currentUser.id || currentUser.uid || currentUser.email) : 'guest';
+  const storageKey = `atlas_wishlist_${userKey}`;
+
+  const loadWishlistFromStorage = (key) => {
     try {
-      const saved = localStorage.getItem('atlas_wishlist_v1');
+      const saved = localStorage.getItem(key);
       if (!saved) return [];
       const parsed = JSON.parse(saved);
       return Array.isArray(parsed) ? parsed : [];
@@ -21,15 +26,22 @@ export const WishlistProvider = ({ children }) => {
       console.error('Error cargando wishlist de localStorage', err);
       return [];
     }
-  });
+  };
+
+  const [wishlist, setWishlist] = useState(() => loadWishlistFromStorage(storageKey));
+
+  // Aislamiento estricto: al cambiar de usuario o cerrar sesión se carga la lista de favoritos correspondiente
+  useEffect(() => {
+    setWishlist(loadWishlistFromStorage(storageKey));
+  }, [storageKey]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('atlas_wishlist_v1', JSON.stringify(wishlist));
+      localStorage.setItem(storageKey, JSON.stringify(wishlist));
     } catch (err) {
       console.error('Error guardando wishlist en localStorage', err);
     }
-  }, [wishlist]);
+  }, [wishlist, storageKey]);
 
   const isInWishlist = (productId) => {
     return wishlist.some((item) => (item.id || item) === productId);

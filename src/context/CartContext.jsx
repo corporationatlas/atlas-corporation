@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
@@ -11,10 +12,14 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-  // Inicialización con persistencia y sanitización estricta de datos
-  const [cart, setCart] = useState(() => {
+  const { currentUser } = useAuth();
+  const userKey = currentUser ? (currentUser.id || currentUser.uid || currentUser.email) : 'guest';
+  const storageKey = `atlas_cart_${userKey}`;
+
+  // Carga segura y sanitizada por usuario
+  const loadCartFromStorage = (key) => {
     try {
-      const saved = localStorage.getItem('atlas_cart_v2') || localStorage.getItem('tienda_cart');
+      const saved = localStorage.getItem(key);
       if (!saved) return [];
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed)) {
@@ -26,7 +31,14 @@ export const CartProvider = ({ children }) => {
     } catch {
       return [];
     }
-  });
+  };
+
+  const [cart, setCart] = useState(() => loadCartFromStorage(storageKey));
+
+  // Aislamiento estricto: al cambiar de usuario o cerrar sesión se cambia al carrito de ese usuario
+  useEffect(() => {
+    setCart(loadCartFromStorage(storageKey));
+  }, [storageKey]);
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [coupon, setCoupon] = useState('');
@@ -34,14 +46,14 @@ export const CartProvider = ({ children }) => {
   const [couponError, setCouponError] = useState('');
   const [toast, setToast] = useState({ show: false, message: '', productName: '' });
 
-  // Guardar en localStorage
+  // Guardar en el almacenamiento del usuario activo
   useEffect(() => {
     try {
-      localStorage.setItem('atlas_cart_v2', JSON.stringify(cart));
+      localStorage.setItem(storageKey, JSON.stringify(cart));
     } catch (err) {
       console.error('Error guardando carrito', err);
     }
-  }, [cart]);
+  }, [cart, storageKey]);
 
   const showToast = (message, productName = '') => {
     setToast({ show: true, message, productName });
