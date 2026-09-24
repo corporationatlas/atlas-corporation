@@ -2,15 +2,15 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Credenciales oficiales del proyecto Google Firebase Atlas Corporation
+// Credenciales seguras mediante variables de entorno Vite (.env)
 const firebaseConfig = {
-  apiKey: "AIzaSyDx2sL19vsc-YrmyfknZCM0oBN1cn_K3YA",
-  authDomain: "atlas-corporation-737bc.firebaseapp.com",
-  projectId: "atlas-corporation-737bc",
-  storageBucket: "atlas-corporation-737bc.firebasestorage.app",
-  messagingSenderId: "581064181515",
-  appId: "1:581064181515:web:5a18bdabd33499ddc9840e",
-  measurementId: "G-F1WSFTPTWQ"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Inicialización de la app y servicios de Firebase
