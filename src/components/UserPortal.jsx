@@ -11,6 +11,7 @@ import {
   User,
   ArrowLeft,
   Camera,
+  Crop,
   Trash2,
   Navigation,
   Compass,
@@ -34,9 +35,10 @@ import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { ProformaInvoiceModal } from './ProformaInvoiceModal';
 import { VehicleModal } from './VehicleModal';
+import { ImageCropperModal } from './ImageCropperModal';
 
 export const UserPortal = () => {
-  const { currentUser, setCurrentView, logout, updateUserProfile, setIsAuthModalOpen } = useAuth();
+  const { currentUser, setCurrentView, openLogoutConfirm, updateUserProfile, setIsAuthModalOpen } = useAuth();
   const { ordersList } = useAdmin();
   const { wishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
@@ -50,6 +52,8 @@ export const UserPortal = () => {
   const [selectedModalVehicle, setSelectedModalVehicle] = useState(null);
   const [addedVehicleId, setAddedVehicleId] = useState(null);
   const fileInputRef = useRef(null);
+  const [rawImageSrc, setRawImageSrc] = useState(null);
+  const [isCropperOpen, setIsCropperOpen] = useState(false);
 
   // Formulario de datos básicos aislado por usuario
   const [profileForm, setProfileForm] = useState({
@@ -141,45 +145,29 @@ export const UserPortal = () => {
     return 1;
   };
 
-  // Subir y comprimir foto de perfil
+  // Subir imagen e iniciar recorte interactivo a merced
   const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Resetear valor para permitir seleccionar la misma foto nuevamente si se desea
+    e.target.value = '';
+
     const reader = new FileReader();
     reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_SIZE = 300;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > MAX_SIZE) {
-            height *= MAX_SIZE / width;
-            width = MAX_SIZE;
-          }
-        } else {
-          if (height > MAX_SIZE) {
-            width *= MAX_SIZE / height;
-            height = MAX_SIZE;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-
-        updateUserProfile({ photoURL: compressedDataUrl });
-        setProfileSaved(true);
-        setTimeout(() => setProfileSaved(false), 2500);
-      };
-      img.src = event.target.result;
+      setRawImageSrc(event.target.result);
+      setIsCropperOpen(true);
     };
     reader.readAsDataURL(file);
+  };
+
+  // Guardar recorte procesado en el perfil y sincronizar con Firestore
+  const handleSaveCroppedPhoto = (croppedDataUrl) => {
+    setIsCropperOpen(false);
+    setRawImageSrc(null);
+    updateUserProfile({ photoURL: croppedDataUrl });
+    setProfileSaved(true);
+    setTimeout(() => setProfileSaved(false), 2500);
   };
 
   const handleRemovePhoto = () => {
@@ -283,6 +271,16 @@ export const UserPortal = () => {
                 {isEn ? 'My Profile' : 'Mi Perfil'}
               </span>
             </div>
+          </button>
+
+          {/* Botón Cerrar Sesión con confirmación */}
+          <button
+            onClick={openLogoutConfirm}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 text-xs font-bold transition-all active:scale-95 shadow-sm cursor-pointer"
+            title={isEn ? 'Log Out' : 'Cerrar Sesión'}
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">{isEn ? 'Log Out' : 'Cerrar Sesión'}</span>
           </button>
         </div>
       </header>
@@ -1029,17 +1027,18 @@ export const UserPortal = () => {
                   <h3 className="text-sm font-bold text-white">{isEn ? 'Profile Picture' : 'Fotografía de Perfil'}</h3>
                   <p className="text-xs text-slate-400">
                     {isEn
-                      ? 'This picture will be reflected in your header, sidebar, and customer profile. Recommended format: JPG or PNG.'
-                      : 'Esta imagen se reflejará en tu encabezado, barra lateral y ficha de cliente. Formato recomendado: JPG o PNG.'}
+                      ? 'This picture will be reflected in your header, sidebar, and customer profile. You can crop, zoom, and adjust it freely.'
+                      : 'Esta imagen se reflejará en tu encabezado, barra lateral y ficha de cliente. Puedes recortarla, acercarla y ajustarla a tu gusto.'}
                   </p>
                   
                   <div className="flex items-center gap-2 justify-center sm:justify-start pt-1">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10"
+                      className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10 flex items-center gap-1.5 cursor-pointer active:scale-95"
                     >
-                      {isEn ? 'Upload New Photo' : 'Subir Nueva Foto'}
+                      <Crop className="w-3.5 h-3.5 text-blue-400" />
+                      <span>{isEn ? 'Upload & Crop Photo' : 'Subir y Recortar Foto'}</span>
                     </button>
 
                     {currentUser?.photoURL && (
@@ -1178,6 +1177,17 @@ export const UserPortal = () => {
           onClose={() => setSelectedModalVehicle(null)}
         />
       )}
+
+      {/* Modal Interactivo de Recorte a Merced de Foto de Perfil */}
+      <ImageCropperModal
+        isOpen={isCropperOpen}
+        imageSrc={rawImageSrc}
+        onClose={() => {
+          setIsCropperOpen(false);
+          setRawImageSrc(null);
+        }}
+        onSaveCrop={handleSaveCroppedPhoto}
+      />
     </div>
   );
 };

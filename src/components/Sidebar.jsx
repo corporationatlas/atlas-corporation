@@ -16,7 +16,7 @@ export const Sidebar = ({
 }) => {
   const { cartCount, setIsCartOpen } = useCart();
   const { companyInfo } = useAdmin();
-  const { currentUser, setCurrentView, setIsAuthModalOpen, logout } = useAuth();
+  const { currentUser, setCurrentView, setIsAuthModalOpen, openLogoutConfirm } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
 
   const navLinks = [
@@ -165,8 +165,8 @@ export const Sidebar = ({
                 </div>
 
                 <button
-                  onClick={logout}
-                  className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  onClick={openLogoutConfirm}
+                  className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
                   title={t('nav.logOut')}
                 >
                   <LogOut className="w-3.5 h-3.5" />

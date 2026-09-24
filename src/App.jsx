@@ -18,6 +18,7 @@ import { Toast } from './components/Toast';
 import { AdminPortal } from './components/AdminPortal';
 import { UserPortal } from './components/UserPortal';
 import { AuthModal } from './components/AuthModal';
+import { LogoutConfirmModal } from './components/LogoutConfirmModal';
 import { Menu, ShoppingCart, ShieldAlert, Package } from 'lucide-react';
 
 function AtlasPublicStore() {
@@ -192,23 +193,22 @@ function AtlasPublicStore() {
 function MainView() {
   const { currentView, currentUser } = useAuth();
 
+  let activeContent = <AtlasPublicStore />;
+
   // Guarda estricta: Solo administradores autenticados pueden ver el panel de administración
   if (currentView === 'admin-portal') {
-    if (!currentUser || currentUser.role !== 'admin') {
-      return <AtlasPublicStore />;
-    }
-    return <AdminPortal />;
+    activeContent = (!currentUser || currentUser.role !== 'admin') ? <AtlasPublicStore /> : <AdminPortal />;
+  } else if (currentView === 'user-portal') {
+    // Guarda estricta: Solo clientes registrados y autenticados pueden ver el panel de pedidos
+    activeContent = (!currentUser) ? <AtlasPublicStore /> : <UserPortal />;
   }
 
-  // Guarda estricta: Solo clientes registrados y autenticados pueden ver el panel de pedidos
-  if (currentView === 'user-portal') {
-    if (!currentUser) {
-      return <AtlasPublicStore />;
-    }
-    return <UserPortal />;
-  }
-
-  return <AtlasPublicStore />;
+  return (
+    <>
+      {activeContent}
+      <LogoutConfirmModal />
+    </>
+  );
 }
 
 export default function App() {

@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
 
@@ -362,6 +363,13 @@ export const AuthProvider = ({ children }) => {
     setCurrentView('store');
   };
 
+  const openLogoutConfirm = () => setIsLogoutConfirmOpen(true);
+  const closeLogoutConfirm = () => setIsLogoutConfirmOpen(false);
+  const confirmLogout = async () => {
+    setIsLogoutConfirmOpen(false);
+    await logout();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -370,6 +378,10 @@ export const AuthProvider = ({ children }) => {
         setCurrentView,
         isAuthModalOpen,
         setIsAuthModalOpen,
+        isLogoutConfirmOpen,
+        openLogoutConfirm,
+        closeLogoutConfirm,
+        confirmLogout,
         authError,
         authLoading,
         login,

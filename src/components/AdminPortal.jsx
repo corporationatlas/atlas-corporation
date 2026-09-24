@@ -51,7 +51,7 @@ export const AdminPortal = () => {
     publishSuccessMsg
   } = useAdmin();
 
-  const { currentUser, setCurrentView, logout, setIsAuthModalOpen } = useAuth();
+  const { currentUser, setCurrentView, openLogoutConfirm, setIsAuthModalOpen } = useAuth();
 
   // GUARDA DE SEGURIDAD ESTRICTA: Acceso exclusivo a usuarios con rol 'admin'
   if (!currentUser || currentUser.role !== 'admin') {
@@ -293,8 +293,8 @@ export const AdminPortal = () => {
           </button>
 
           <button
-            onClick={logout}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-all"
+            onClick={openLogoutConfirm}
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-all cursor-pointer"
             title="Cerrar sesión"
           >
             <LogOut className="w-4 h-4" />
